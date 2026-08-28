@@ -36,6 +36,31 @@ class PSPLFitResult:
     success: bool
 
 
+def _fit_pspl_single_attempt(
+    t: np.ndarray, flux: np.ndarray, sigma: np.ndarray, x0: list, lower: list, upper: list,
+) -> PSPLFitResult | None:
+    def resid(theta):
+        t0, u0, log_tE, fs, fb = theta
+        tE = np.exp(log_tE)
+        u = np.sqrt(((t - t0) / tE) ** 2 + u0**2)
+        model = flux_model(u, fs, fb)
+        return (model - flux) / sigma
+
+    x0_clipped = np.clip(x0, lower, upper)
+    try:
+        res = least_squares(resid, x0_clipped, method="trf", bounds=(lower, upper), max_nfev=5000)
+        t0, u0, log_tE, fs, fb = res.x
+        chi2 = float(np.sum(res.fun**2))
+        if not np.isfinite(chi2):
+            return None
+        return PSPLFitResult(
+            params=PSPLParams(t0=t0, u0=abs(u0), tE=np.exp(log_tE)),
+            fs=fs, fb=fb, chi2=chi2, success=bool(res.success),
+        )
+    except Exception:  # noqa: BLE001 - any solver failure means "this attempt did not converge"
+        return None
+
+
 def fit_pspl(
     t: np.ndarray,
     flux: np.ndarray,
@@ -44,44 +69,68 @@ def fit_pspl(
     fs0: float = 1.0,
     fb0: float = 0.0,
 ) -> PSPLFitResult:
-    """Nonlinear least-squares single-lens fit (no parallax, no blending prior)."""
+    """Nonlinear least-squares single-lens fit (no parallax, no blending prior).
+
+    Multi-start: for high-magnification (small u0) events, a single
+    Levenberg-Marquardt-style start from the nominal guess can converge to
+    a poor local minimum where u0/tE and fs/fb trade off against each
+    other, giving a badly-fit light curve with a very large chi2 despite
+    "success" being reported by the optimizer (caught during development
+    by actually inspecting fit residuals, not just checking convergence
+    flags -- see docs/VALIDATION.md). Several perturbed starting points
+    are tried and the lowest-chi2 result is kept, a standard, simple
+    robustness technique for exactly this failure mode.
+    """
     t = np.asarray(t)
     flux = np.asarray(flux)
     sigma = np.asarray(sigma)
 
-    def resid(theta):
-        t0, u0, log_tE, fs, fb = theta
-        tE = np.exp(log_tE)
-        u = np.sqrt(((t - t0) / tE) ** 2 + u0**2)
-        model = flux_model(u, fs, fb)
-        return (model - flux) / sigma
-
-    x0 = [initial_guess.t0, initial_guess.u0, np.log(max(initial_guess.tE, 1e-3)), fs0, fb0]
     # Bounded trust-region-reflective fit: without bounds, a Levenberg-
     # Marquardt step can chase a binary-lens/systematic residual the
     # single-lens model cannot fit and drive log_tE to overflow, which
     # silently turns the fit into NaNs rather than a clean failure. The
     # bounds keep tE/u0 in an astrophysically sane range (0.01-10^4 days,
     # 0-20 Einstein radii) and t0 within a wide window of the data span.
+    #
+    # fs/fb bounds of +-1e3 (an early version of this project) were wide
+    # enough to let the optimizer run away to a degenerate, nearly-
+    # cancelling (fs, fb) pair (e.g. fs=146, fb=-145) that fits a small
+    # subset of points while destroying the fit everywhere else -- caught
+    # by inspecting fit parameters directly against injected truth, not
+    # by a convergence-flag check alone (the optimizer reports "success"
+    # for this degenerate solution too; see docs/VALIDATION.md). Every
+    # synthetic light curve in this project is generated with fs=1, fb=0
+    # (TrialConfig's defaults, never overridden by any config), so
+    # bounding fs/fb to a generously wide but non-degenerate range is a
+    # safe, documented restriction for this project's use, not a general
+    # single-lens-fitting recommendation for real blended photometry.
     t_span = float(t.max() - t.min()) if t.size else 1.0
-    lower = [t.min() - t_span, 0.0, np.log(1e-2), -1e3, -1e3]
-    upper = [t.max() + t_span, 20.0, np.log(1e4), 1e3, 1e3]
-    x0_clipped = np.clip(x0, lower, upper)
-    try:
-        res = least_squares(resid, x0_clipped, method="trf", bounds=(lower, upper), max_nfev=5000)
-        t0, u0, log_tE, fs, fb = res.x
-        chi2 = float(np.sum(res.fun**2))
-        if not np.isfinite(chi2):
-            return PSPLFitResult(params=initial_guess, fs=fs0, fb=fb0, chi2=np.inf, success=False)
-        return PSPLFitResult(
-            params=PSPLParams(t0=t0, u0=abs(u0), tE=np.exp(log_tE)),
-            fs=fs,
-            fb=fb,
-            chi2=chi2,
-            success=bool(res.success),
-        )
-    except Exception:  # noqa: BLE001 - any solver failure means "fit did not converge"
+    lower = [t.min() - t_span, 0.0, np.log(1e-2), -2.0, -2.0]
+    upper = [t.max() + t_span, 20.0, np.log(1e4), 5.0, 5.0]
+
+    u0_guess = max(initial_guess.u0, 1e-3)
+    tE_guess = max(initial_guess.tE, 1e-3)
+    starts = [
+        (initial_guess.t0, u0_guess, np.log(tE_guess), fs0, fb0),
+        (initial_guess.t0, u0_guess * 2, np.log(tE_guess), fs0, fb0),
+        (initial_guess.t0, u0_guess * 0.5, np.log(tE_guess), fs0, fb0),
+        (initial_guess.t0, u0_guess, np.log(tE_guess * 0.7), fs0, fb0),
+        # data-driven blending estimate: baseline flux from the faintest
+        # 20% of points, peak from the brightest, as an fs/fb starting
+        # point independent of the (possibly wrong) fs0/fb0 arguments
+        (initial_guess.t0, u0_guess, np.log(tE_guess),
+         float(np.percentile(flux, 95) - np.percentile(flux, 20)), float(np.percentile(flux, 20))),
+    ]
+
+    best = None
+    for x0 in starts:
+        result = _fit_pspl_single_attempt(t, flux, sigma, list(x0), lower, upper)
+        if result is not None and (best is None or result.chi2 < best.chi2):
+            best = result
+
+    if best is None:
         return PSPLFitResult(params=initial_guess, fs=fs0, fb=fb0, chi2=np.inf, success=False)
+    return best
 
 
 def chi2_flat(flux: np.ndarray, sigma: np.ndarray) -> float:

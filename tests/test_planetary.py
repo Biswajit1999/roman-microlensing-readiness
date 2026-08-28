@@ -30,10 +30,24 @@ def test_wide_separation_matches_two_decoupled_lenses():
     (flux contribution from the distant second lens is negligible there)."""
     rho = 0.02
     s = 8.0
-    cfg = BinaryLensConfig(q=0.05, s=s, rho=rho, grid_n=600, box_half_width=12.0)
+    # grid_n=1300 keeps the ray-shooting cell size (2*12/1300 ~ 0.0185)
+    # below rho=0.02, satisfying build_ray_shot_tree's undersampling guard.
+    cfg = BinaryLensConfig(q=0.05, s=s, rho=rho, grid_n=1300, box_half_width=12.0)
     tau = np.array([0.0, 0.05])
     beta = np.array([0.05, 0.1])
     a_binary = magnification_binary_track(tau, beta, cfg)
     u = np.sqrt(tau**2 + beta**2)
     a_primary_only = magnification_pspl(u)
     np.testing.assert_allclose(a_binary, a_primary_only, rtol=0.1)
+
+
+def test_undersampled_grid_raises_instead_of_silently_returning_bad_values():
+    """Regression test: rho smaller than the ray-shooting cell size
+    previously produced a silently wrong (spuriously large) magnification
+    near peak brightness -- caught by comparing an injected light curve
+    against the analytic q->0 limit during development of the bound-planet
+    injection-recovery grid (see docs/VALIDATION.md). It must now raise
+    rather than return an unreliable number."""
+    cfg = BinaryLensConfig(q=0.0001, s=1.0, rho=0.005, grid_n=250)
+    with pytest.raises(ValueError, match="undersampled|cell size|rho"):
+        magnification_binary_track(np.array([0.0]), np.array([0.05]), cfg)

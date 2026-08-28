@@ -47,8 +47,11 @@ def test_null_trial_no_signal_rarely_triggers_detection():
 @pytest.mark.slow
 def test_planetary_channel_runs_end_to_end():
     cfg = TrialConfig(
-        channel="planetary", u0=0.05, tE=20.0, rho=0.005, q=0.01, s=1.0, t0=40.0,
-        mag_ref=18.0, seed=0, cadence=_FAST_CADENCE, grid_n=300,
+        # rho=0.02 with grid_n=400 keeps the ray-shooting cell size below
+        # rho (see planetary.py's undersampling guard); rho=0.005 was too
+        # small for grid_n=300 and triggered it.
+        channel="planetary", u0=0.05, tE=20.0, rho=0.02, q=0.01, s=1.0, t0=40.0,
+        mag_ref=18.0, seed=0, cadence=_FAST_CADENCE, grid_n=400,
     )
     result = run_trial(cfg)
     assert result.event_delta_chi2 >= 0

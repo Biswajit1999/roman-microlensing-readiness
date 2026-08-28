@@ -23,12 +23,55 @@ authoritative, re-runnable checks are the pytest suite referenced below.
 | Data adapter (full dataset) | Full 293-row `Answers/master_file.txt` parses to exactly the published per-class counts (74/83/43/93) | Manual one-off run against the live upstream file, 2026-08-28 | not yet wired into CI as an automated network test beyond `test_real_download_and_manifest` | 293/293 rows parsed; class counts 74 (dcnormffp), 83 (ombin), 43 (omcassan), 93 (dccv) match Penny et al.'s published dataset description exactly |
 | End-to-end pipeline | CLI `run-grid` on `configs/smoke_test.yaml` produces physically sensible trends (higher tE / smaller u0 -> higher recovered delta-chi2; an in-season vs. in-gap `t0` changes `n_points_in_anomaly_window` as expected) | Manual run, 2026-08-28 | `configs/smoke_test.yaml` | Confirmed by inspection of `results/smoke/trials.csv` during development; see git history |
 
+## Open validation failure: bound-planet-channel population grid (2026-08-28)
+
+Attempting to run a bound-planet-channel injection-recovery grid
+(`configs/planetary.yaml`) surfaced a real, unresolved bug: at q=0.0001
+(negligible planet), `magnification_binary_track` disagrees with the
+exact point-lens formula by up to ~0.8-1.0 in magnification at some
+trajectory points, and **this does not shrink with finer ray-shooting
+resolution** (max|diff| = 0.78, 0.94, 0.99 at grid_n = 350, 700, 1400 --
+flat-to-growing). This was caught specifically because the fitted
+single-lens model, evaluated against the *actual* injected flux, gave
+chi2/n = 1.00 (a perfect fit) while the same fit evaluated against the
+*exact analytic* PSPL formula gave chi2/n = 4.37 -- proving the
+discrepancy is in the ray-shooting magnification itself, not the
+fit/noise/detection code (all of which check out as correct via this same
+diagnostic). Two related, real bugs were found and fixed in the same
+investigation:
+
+1. **Ray-shooting undersampling could silently invert the result.** The
+   original `configs/planetary.yaml` used `rho=0.005` with `grid_n=250`,
+   giving an image-plane cell size (~0.024) *larger* than the source disk
+   -- a regime `planetary.py`'s validated tests never exercised. This
+   produced a spuriously large (~3x) magnification spike near peak
+   brightness. Fixed by adding a runtime guard in
+   `build_ray_shot_tree` that raises `ValueError` instead of silently
+   returning an unreliable number when `cell_size > rho`
+   (`tests/test_planetary.py::test_undersampled_grid_raises_instead_of_silently_returning_bad_values`).
+2. **Unconstrained fs/fb bounds let the single-lens fit run away to a
+   degenerate solution** (e.g. fs=146, fb=-145, nearly cancelling) for
+   some high-magnification configurations, reported as "success" by the
+   optimizer despite being clearly wrong. Fixed by tightening the fs/fb
+   fit bounds to [-2, 5] (documented as safe specifically because every
+   synthetic light curve in this project uses fs=1, fb=0; see
+   `detect.py`).
+
+Both fixes are real and are included in this release. The **third,
+deeper issue** (the non-shrinking-with-resolution discrepancy itself) is
+**not fixed** -- root cause not yet identified. See
+`docs/LIMITATIONS.md` for the full writeup and the pinned GitHub issue.
+No bound-planet-channel population result is published in this release
+because of this open issue.
+
 ## Explicitly not yet validated
 
+- The root cause of the non-shrinking ray-shooting discrepancy above
+  (pinned, high-priority repository issue).
 - No cross-check yet against an independently implemented microlensing
   package (`pyLIMA`, `MulensModel`, `VBMicrolensing`) on a shared test
-  event. This is the single highest-value remaining validation step and is
-  tracked as a repository issue.
+  event. This is now an even higher-priority validation step given the
+  finding above, and is tracked as a repository issue.
 - No comparison of recovered completeness against a previously published
   Roman/WFIRST injection-recovery study's numbers (e.g. Penny et al. 2019
   Figure values) at matched parameters -- the cadence and noise models here

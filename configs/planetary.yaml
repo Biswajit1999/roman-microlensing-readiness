@@ -1,0 +1,45 @@
+# Bound-planet channel injection-recovery grid.
+#
+# STATUS: NOT YET USABLE FOR A PUBLISHED RESULT. Running this config
+# (2026-08-28) surfaced a real, unresolved numerical issue in
+# magnification_binary_track: even at q=0.0001 (negligible planet), its
+# output differs from the exact point-lens formula by up to ~0.8-1.0 in
+# magnification at some trajectory points, and that discrepancy does NOT
+# shrink as grid_n is increased (350 -> 700 -> 1400 gives max|diff| of
+# 0.78, 0.94, 0.99 -- flat or growing, not the O(1/sqrt(N)) shrinkage
+# expected of a sampling-noise-only effect). This makes any
+# injection-recovery grid built from it untrustworthy until the root
+# cause is found -- see docs/LIMITATIONS.md and the pinned GitHub issue.
+# Do not publish results from this config until that issue is resolved.
+#
+# The cadence/resolution scoping below (2-season cadence, rho=0.02,
+# grid_n=350) is still correct and kept for whoever picks up that issue.
+channel: planetary
+
+cadence:
+  n_seasons: 2
+  season_length_days: 72
+  season_gap_days: 61
+  cadence_minutes: 15
+  downlink_gap_every_hours: 12
+  downlink_gap_minutes: 40
+  random_dropout_frac: 0.02
+  t0_days: 0
+
+fixed:
+  t0: 30.0
+  tE: 20.0
+  rho: 0.02
+  s: 1.0
+  fs: 1.0
+  fb: 0.0
+  detection_threshold: 500.0
+  anomaly_threshold: 160.0
+  grid_n: 350
+
+grid:
+  u0: [0.05, 0.3, 0.8]
+  q: [0.0001, 0.001, 0.01]
+  mag_ref: [19.0, 21.5, 23.5]
+
+n_seeds_per_point: 3

@@ -5,15 +5,35 @@ is a sign of insufficient testing, not a sign of a finished project.
 
 ## Binary-lens (planetary channel) solver
 
-- `planetary.magnification_binary_track` uses inverse ray shooting, not a
-  closed-form/exact solver. Accuracy scales with `grid_n` (rays per side);
-  the default (`grid_n=400-800` depending on call site) gives ~5-10%
-  agreement with the two analytic limits tested in
-  `tests/test_planetary.py` (vanishing mass ratio; wide separation), not
-  sub-percent precision. Do not use this module for a precision retrieval
-  of a real candidate event; it is designed for population-level
-  injection-recovery statistics, where this level of per-event scatter
-  averages out over many trials.
+- **Open, unresolved issue (found 2026-08-28, not yet fixed): a
+  non-shrinking discrepancy from the exact point-lens limit.** Attempting
+  a bound-planet population injection-recovery grid surfaced a real bug:
+  even at q=0.0001 (a negligible planet, which should reduce almost
+  exactly to the finite-source point-lens result), `magnification_binary_track`
+  disagrees with the exact point-lens formula by up to ~0.8-1.0 in
+  magnification at some points along a typical trajectory. Critically,
+  this discrepancy does **not** shrink with finer sampling: max|diff| was
+  0.78, 0.94, and 0.99 at `grid_n` = 350, 700, and 1400 respectively --
+  flat-to-growing, not the O(1/sqrt(N)) shrinkage expected of a pure
+  ray-density sampling-noise effect. This means the discrepancy is a real
+  algorithmic bug, not (only) an undersampling artifact, and it is **not
+  fixed by increasing grid_n**. Root cause not yet identified. Until this
+  is resolved, **no bound-planet-channel injection-recovery result from
+  this project should be treated as valid** -- `configs/planetary.yaml`
+  and any grid run from it are explicitly withheld from `results/` for
+  exactly this reason (see the config's own header). Tracked as a
+  pinned, high-priority repository issue.
+- Separately, and more routinely: `planetary.magnification_binary_track`
+  uses inverse ray shooting, not a closed-form/exact solver, and has an
+  inherent per-call, Monte-Carlo-like scatter that *does* shrink with
+  `grid_n` in the two narrower, specific configurations validated in
+  `tests/test_planetary.py` (vanishing mass ratio at fixed beta=0.1;
+  wide separation at two fixed trajectory points) -- ~5-10% agreement
+  there, not sub-percent precision. That validated, shrinking-with-
+  resolution scatter is a separate, expected limitation from the
+  non-shrinking discrepancy described above, which was only found by
+  sweeping many more trajectory points than those two tests cover. Do not
+  use this module for a precision retrieval of a real candidate event.
 - When zero rays land inside the (typically small) source disk for a given
   trajectory point -- a finite-ray-density undersampling artifact, not a
   physical demagnification-to-zero -- the code floors the magnification at

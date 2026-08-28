@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "romanmlr"
-version = "0.2.0"
+version = "0.3.0"
 description = "Injection-recovery study of Roman Space Telescope GBTDS microlensing completeness and false-positive rate under realistic cadence, blending, finite-source, parallax, and correlated-noise effects."
 readme = "README.md"
 requires-python = ">=3.10"

@@ -60,6 +60,24 @@ def build_ray_shot_tree(cfg: BinaryLensConfig) -> tuple[cKDTree, float, int]:
     Returns (tree over mapped source-plane positions, image-plane cell area,
     number of rays). Reuse the same tree for every epoch of one light curve.
     """
+    half_check = cfg.box_half_width or _default_box_half_width(cfg)
+    cell_size = 2 * half_check / cfg.grid_n
+    if cell_size > cfg.rho:
+        # A source disk smaller than a single image-plane grid cell is
+        # severely undersampled: the ray count landing inside it becomes
+        # essentially random (0, 1, a few...), which can produce a
+        # spuriously large or small magnification rather than a merely
+        # imprecise one -- caught during development by comparing a
+        # ray-shot light curve against the analytic point-lens q->0 limit
+        # and finding a ~3x spurious spike near peak magnification for
+        # rho=0.005, grid_n=250 (see docs/VALIDATION.md). Raise rather
+        # than silently return an unreliable number.
+        raise ValueError(
+            f"rho={cfg.rho} is smaller than the ray-shooting cell size "
+            f"({cell_size:.4g}, from grid_n={cfg.grid_n}); increase grid_n or rho "
+            f"until cell_size <= rho (see docs/LIMITATIONS.md)."
+        )
+
     m1 = 1.0 / (1.0 + cfg.q)
     m2 = cfg.q / (1.0 + cfg.q)
     z1 = 0.0 + 0.0j

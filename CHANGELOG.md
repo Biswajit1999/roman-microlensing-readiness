@@ -4,6 +4,35 @@ All notable changes to this project are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows
 [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-08-28
+
+### Fixed
+
+- Ray-shooting undersampling in `planetary.build_ray_shot_tree` could
+  silently produce a spurious ~3x magnification spike when the image-plane
+  cell size exceeded the source radius `rho`. Now raises `ValueError`
+  instead of returning an unreliable number
+  (`tests/test_planetary.py::test_undersampled_grid_raises_instead_of_silently_returning_bad_values`).
+- `detect.fit_pspl` could converge to a degenerate, nearly-cancelling
+  (fs, fb) solution (e.g. fs=146, fb=-145) for high-magnification events,
+  reported as "success" despite being clearly wrong. Fixed by tightening
+  the fs/fb fit bounds to [-2, 5] (safe for this project: every synthetic
+  light curve uses fs=1, fb=0) and by trying 5 perturbed starting points
+  and keeping the lowest-chi2 result (multi-start fitting).
+
+### Known issue (unresolved, not fixed in this release)
+
+- Attempting a bound-planet-channel injection-recovery grid
+  (`configs/planetary.yaml`) surfaced a deeper, unresolved bug: even at
+  q=0.0001 (negligible planet), `magnification_binary_track` disagrees
+  with the exact point-lens formula by up to ~0.8-1.0 in magnification at
+  some trajectory points, and this discrepancy does **not** shrink with
+  finer ray-shooting resolution (max|diff| = 0.78, 0.94, 0.99 at grid_n =
+  350, 700, 1400). Root cause not yet identified. No bound-planet-channel
+  population result is published in this release; see
+  `docs/LIMITATIONS.md` and `docs/VALIDATION.md` for the full writeup and
+  the pinned repository issue.
+
 ## [0.2.0] - 2026-08-28
 
 ### Added
