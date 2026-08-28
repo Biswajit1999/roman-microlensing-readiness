@@ -2,6 +2,13 @@
 # under a Penny-et-al.-(2019)-like Roman GBTDS cadence. See docs/METHODS.md
 # for the full experimental design and docs/DATA_SOURCES.md for parameter
 # provenance.
+#
+# The grid spans source brightness (mag_ref) as well as impact parameter and
+# Einstein-crossing time, because brightness (crowding/blending proxy) is a
+# first-order driver of Roman GBTDS microlensing completeness alongside
+# event geometry -- a grid that only varies u0/tE at one fixed, bright
+# magnitude does not probe the actual detection boundary (see
+# docs/CLAIMS.md item 9 and the run history in results/default/).
 channel: ffp
 
 cadence:
@@ -16,15 +23,15 @@ cadence:
 
 fixed:
   t0: 30.0
-  mag_ref: 19.5
   fs: 1.0
   fb: 0.0
+  rho: 0.005
   detection_threshold: 500.0
   anomaly_threshold: 160.0
 
 grid:
-  u0: [0.01, 0.05, 0.1, 0.3, 0.6, 1.0]
-  tE: [0.1, 0.3, 1.0, 3.0]
-  rho: [0.001, 0.01]
+  mag_ref: [19.0, 22.0, 24.0, 25.5]
+  u0: [0.02, 0.1, 0.3, 0.6, 1.0, 1.5, 2.5]
+  tE: [0.02, 0.08, 0.3, 1.0]
 
 n_seeds_per_point: 5

@@ -4,7 +4,24 @@ All notable changes to this project are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows
 [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.2.0] - 2026-08-28
+
+### Added
+
+- Completed the free-floating-planet (FFP) channel synthetic
+  injection-recovery grid (`configs/default.yaml`, 560 trials): 58.0%
+  overall recovery, with completeness falling with fainter magnitude and
+  larger impact parameter (`results/default/`, `paper/manuscript.md`
+  Section 4).
+- Matched 200-trial null (no-signal) false-positive-rate estimate: 0/200
+  (Wilson 95% CI upper bound 1.9%) at the delta-chi2 > 500 event-detection
+  threshold (`results/default/false_positive_rate.json`).
+- 8 starter contributor issues filed covering cross-validation, limb
+  darkening, the bound-planet-channel population run, adaptive mesh
+  refinement, the anomaly-window heuristic, website scoping, Colab
+  confirmation, and multi-band fitting.
+
+## [0.1.0] - 2026-08-28
 
 ### Added
 

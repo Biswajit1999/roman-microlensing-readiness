@@ -9,4 +9,4 @@ This package makes no discovery claims. All events analyzed by default are
 simulated challenge data with known injected ground truth.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

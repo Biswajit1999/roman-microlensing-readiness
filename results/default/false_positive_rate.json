@@ -1,0 +1,7 @@
+{
+  "n_trials": 200,
+  "n_false_positive": 0,
+  "fpr": 0.0,
+  "ci_low": 0.0,
+  "ci_high": 0.018845326377266575
+}
