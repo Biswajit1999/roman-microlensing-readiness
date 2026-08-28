@@ -1,0 +1,28 @@
+# Tiny grid for CI / reproduction smoke tests: runs in seconds, not a
+# scientific result. See configs/default.yaml for the real experiment.
+channel: ffp
+
+cadence:
+  n_seasons: 2
+  season_length_days: 72
+  season_gap_days: 61
+  cadence_minutes: 15
+  downlink_gap_every_hours: 12
+  downlink_gap_minutes: 40
+  random_dropout_frac: 0.02
+  t0_days: 0
+
+fixed:
+  t0: 30.0
+  mag_ref: 19.5
+  fs: 1.0
+  fb: 0.0
+  detection_threshold: 500.0
+  anomaly_threshold: 160.0
+
+grid:
+  u0: [0.05, 0.5]
+  tE: [0.5, 2.0]
+  rho: [0.01]
+
+n_seeds_per_point: 2

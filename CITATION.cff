@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Roman Microlensing Readiness Benchmark"
+type: software
+authors:
+  - family-names: "Jana"
+    given-names: "Biswajit"
+version: 0.1.0
+date-released: 2026-08-28
+url: "https://github.com/Biswajit1999/roman-microlensing-readiness"
+license: MIT
+keywords:
+  - microlensing
+  - Roman Space Telescope
+  - exoplanets
+  - injection-recovery
+  - astrophysics
+references:
+  - type: article
+    authors:
+      - family-names: "Penny"
+        given-names: "Matthew T."
+    title: "Predictions of the Nancy Grace Roman Space Telescope Galactic Exoplanet Survey I: Complete Predicted Planet Yields"
+    journal: "The Astrophysical Journal Supplement Series"
+    volume: 241
+    year: 2019
+  - type: article
+    authors:
+      - family-names: "Johnson"
+        given-names: "Samson A."
+    title: "Predictions of the Nancy Grace Roman Space Telescope Galactic Exoplanet Survey II: Free-floating Planet Detection Rates"
+    journal: "The Astronomical Journal"
+    volume: 160
+    year: 2020
+  - type: data
+    authors:
+      - family-names: "Penny"
+        given-names: "Matthew T."
+    title: "WFIRST/Roman 2018 Microlensing Data Challenge"
+    url: "https://github.com/microlensing-data-challenge/data-challenge-1"
