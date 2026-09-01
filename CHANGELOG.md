@@ -4,6 +4,17 @@ All notable changes to this project are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows
 [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-09-01
+
+- Reframed the display title as a scoped synthetic point-lens recovery study.
+- Replaced obsolete consecutive-season defaults with an explicit versioned
+  six-season F146 high-cadence proxy.
+- Replaced truth-seeded fitting with a blind, fixed-search-space event finder.
+- Separated event detection from parameter recovery and retained fitted values.
+- Added raw null trials, copied configurations, and run manifests.
+- Disabled the invalid binary-lens pathway at runtime.
+- Superseded all earlier aggregate results pending post-audit regeneration.
+
 ## [0.3.0] - 2026-08-28
 
 ### Fixed

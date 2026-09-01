@@ -1,6 +1,8 @@
-"""Injection-recovery engine: inject a planetary or free-floating-planet (FFP)
-signal into a synthetic Roman-GBTDS-like light curve and test whether the
-transparent single-lens detection statistic (detect.py) recovers it.
+"""Synthetic point-lens injection/recovery engine.
+
+The current validated pathway is point-lens only. The repository's custom
+binary-lens solver is retained for diagnosis but is deliberately unavailable
+to scientific runs until it passes an independent reference-model comparison.
 
 Each trial is fully specified by a frozen, hashable config (seed included),
 so every result row is independently reproducible from its own parameters --
@@ -15,13 +17,9 @@ import numpy as np
 import pandas as pd
 
 from .cadence import CadenceConfig, generate_observation_times
-from .detect import anomaly_delta_chi2, event_delta_chi2, fit_pspl
+from .detect import blind_search_pspl, event_delta_chi2
 from .noise import NoiseConfig, add_noise
-from .planetary import (
-    BinaryLensConfig,
-    free_floating_planet_magnification,
-    magnification_binary_track,
-)
+from .planetary import free_floating_planet_magnification
 from .pspl import PSPLParams
 
 
@@ -31,7 +29,7 @@ class TrialConfig:
     u0: float
     tE: float
     rho: float
-    t0: float = 0.0
+    t0: float | None = None
     q: float = 0.0     # planetary channel only
     s: float = 1.0     # planetary channel only
     fs: float = 1.0
@@ -41,6 +39,7 @@ class TrialConfig:
     detection_threshold: float = 500.0
     anomaly_threshold: float = 160.0
     cadence: CadenceConfig = field(default_factory=CadenceConfig)
+    noise: NoiseConfig = field(default_factory=NoiseConfig)
     grid_n: int = 400  # binary-lens ray-shooting resolution (planetary channel)
 
 
@@ -50,97 +49,78 @@ class TrialResult:
     event_detected: bool
     anomaly_detected: bool
     recovered: bool
+    parameters_recovered: bool
     event_delta_chi2: float
     anomaly_delta_chi2: float
     failure_reason: str
     n_points_in_anomaly_window: int
     wall_time_s: float
+    injected_t0: float
+    fitted_t0: float
+    fitted_u0: float
+    fitted_tE: float
 
 
-def _anomaly_window_mask(t: np.ndarray, t0: float, tE: float, rho: float, q: float, s: float) -> np.ndarray:
-    """Heuristic window around the perturbation used for the anomaly chi2
-    statistic: for the FFP channel this is simply the peak region (the whole
-    event *is* the anomaly relative to a flat baseline); for the planetary
-    channel it is a window around where the source trajectory passes closest
-    to the companion at separation s (Einstein radii of the total system).
-    """
-    if q <= 0:
-        return np.abs(t - t0) < 2 * tE
-    # time at which |tau| ~ s (closest approach to the companion's location)
-    t_anom = t0 + s * tE
-    half_width = max(3 * rho * tE, 0.5)
-    return np.abs(t - t_anom) < half_width
+def _sample_event_epoch(cfg: TrialConfig, rng: np.random.Generator) -> float:
+    if cfg.t0 is not None:
+        return float(cfg.t0)
+    season = int(rng.integers(0, len(cfg.cadence.season_start_days)))
+    return float(cfg.cadence.season_start_days[season] + rng.uniform(0, cfg.cadence.season_length_days))
 
 
 def run_trial(cfg: TrialConfig) -> TrialResult:
     start = time.perf_counter()
     obs_cadence = CadenceConfig(**{**asdict(cfg.cadence), "seed": cfg.seed})
     t = generate_observation_times(obs_cadence)
+    if cfg.channel == "planetary" or cfg.q > 0:
+        raise RuntimeError(
+            "planetary inference is disabled: the inverse-ray-shooting solver has not "
+            "passed independent binary-lens validation"
+        )
 
-    truth = PSPLParams(t0=cfg.t0, u0=cfg.u0, tE=cfg.tE)
+    rng = np.random.default_rng(cfg.seed)
+    injected_t0 = _sample_event_epoch(cfg, rng)
+    truth = PSPLParams(t0=injected_t0, u0=cfg.u0, tE=cfg.tE)
     tau = (t - truth.t0) / truth.tE
     beta = np.full_like(tau, truth.u0)
 
-    if cfg.channel == "planetary" and cfg.q > 0:
-        blens_cfg = BinaryLensConfig(q=cfg.q, s=cfg.s, rho=cfg.rho, grid_n=cfg.grid_n)
-        amp = magnification_binary_track(tau, beta, blens_cfg)
-    else:
-        u = np.sqrt(tau**2 + beta**2)
-        amp = free_floating_planet_magnification(u, cfg.rho)
+    u = np.sqrt(tau**2 + beta**2)
+    amp = free_floating_planet_magnification(u, cfg.rho)
 
     flux_clean = cfg.fs * amp + cfg.fb
     mag_clean = -2.5 * np.log10(np.clip(flux_clean, 1e-6, None)) + cfg.mag_ref
-    noise_cfg = NoiseConfig(seed=cfg.seed)
+    noise_cfg = NoiseConfig(**{**asdict(cfg.noise), "seed": cfg.seed})
     mag_noisy, sigma_mag = add_noise(mag_clean, noise_cfg)
     flux_noisy = 10 ** (-0.4 * (mag_noisy - cfg.mag_ref))
     sigma_flux = np.abs(flux_noisy * np.log(10) * 0.4 * sigma_mag)
     sigma_flux = np.maximum(sigma_flux, 1e-6)
 
-    guess = PSPLParams(t0=cfg.t0, u0=max(cfg.u0, 1e-3), tE=cfg.tE)
-    fit = fit_pspl(t, flux_noisy, sigma_flux, guess, fs0=cfg.fs, fb0=cfg.fb)
+    fit = blind_search_pspl(t, flux_noisy, sigma_flux)
 
     dchi2_event = event_delta_chi2(fit, flux_noisy, sigma_flux)
     event_detected = dchi2_event > cfg.detection_threshold
 
-    anomaly_mask = _anomaly_window_mask(t, cfg.t0, cfg.tE, cfg.rho, cfg.q, cfg.s)
-    n_anom = int(anomaly_mask.sum())
-    dchi2_anom = (
-        anomaly_delta_chi2(t, flux_noisy, sigma_flux, fit, anomaly_mask) if n_anom else 0.0
-    )
-
-    is_ffp = cfg.channel == "ffp" or cfg.q <= 0
-    if is_ffp:
+    if cfg.channel == "ffp":
         # The FFP signal *is* the single-lens event fit here; there is no
         # separate host-star baseline for a perturbation to sit on top of,
         # so a single-lens fit describes the true model and the anomaly
         # window's residual chi2 is expected to be pure noise (~n_points)
         # regardless of event brightness -- it is diagnostic only and does
         # not gate recovery. Recovery is event detection alone.
-        anomaly_detected = event_detected
+        anomaly_detected = False
+        parameters_recovered = bool(
+            event_detected
+            and abs(fit.params.t0 - truth.t0) <= max(0.1 * truth.tE, cfg.cadence.cadence_minutes / 1440)
+            and abs(fit.params.tE - truth.tE) / truth.tE <= 0.5
+            and abs(fit.params.u0 - truth.u0) <= 0.2
+        )
         recovered = event_detected
         if recovered:
-            reason = "recovered"
-        elif n_anom == 0:
-            reason = "no_epochs_in_anomaly_window"
+            reason = "event_detected_parameters_recovered" if parameters_recovered else "event_detected_parameters_not_recovered"
         else:
             reason = "event_below_threshold"
     else:
-        # Bound-planet channel: the injected data include a genuine
-        # binary-lens perturbation that the single-lens fit cannot match,
-        # so real excess chi2 in the anomaly window is the detection
-        # signature on top of (required) event detection.
-        if n_anom == 0:
-            anomaly_detected = False
-            reason = "no_epochs_in_anomaly_window"
-        else:
-            anomaly_detected = dchi2_anom > cfg.anomaly_threshold
-            if not event_detected:
-                reason = "event_below_threshold"
-            elif not anomaly_detected:
-                reason = "anomaly_below_threshold"
-            else:
-                reason = "recovered"
-        recovered = event_detected and anomaly_detected
+        raise ValueError("channel must be 'ffp'; planetary inference is disabled")
 
     elapsed = time.perf_counter() - start
     return TrialResult(
@@ -148,11 +128,16 @@ def run_trial(cfg: TrialConfig) -> TrialResult:
         event_detected=bool(event_detected),
         anomaly_detected=bool(anomaly_detected),
         recovered=bool(recovered),
+        parameters_recovered=bool(parameters_recovered),
         event_delta_chi2=float(dchi2_event),
-        anomaly_delta_chi2=float(dchi2_anom),
+        anomaly_delta_chi2=float("nan"),
         failure_reason=reason,
-        n_points_in_anomaly_window=n_anom,
+        n_points_in_anomaly_window=0,
         wall_time_s=elapsed,
+        injected_t0=injected_t0,
+        fitted_t0=float(fit.params.t0),
+        fitted_u0=float(fit.params.u0),
+        fitted_tE=float(fit.params.tE),
     )
 
 
@@ -170,11 +155,16 @@ def run_grid(configs: list[TrialConfig]) -> pd.DataFrame:
             "s": cfg.s,
             "mag_ref": cfg.mag_ref,
             "seed": cfg.seed,
+            "injected_t0": r.injected_t0,
+            "fitted_t0": r.fitted_t0,
+            "fitted_u0": r.fitted_u0,
+            "fitted_tE": r.fitted_tE,
             "event_delta_chi2": r.event_delta_chi2,
             "anomaly_delta_chi2": r.anomaly_delta_chi2,
             "event_detected": r.event_detected,
             "anomaly_detected": r.anomaly_detected,
             "recovered": r.recovered,
+            "parameters_recovered": r.parameters_recovered,
             "failure_reason": r.failure_reason,
             "n_points_in_anomaly_window": r.n_points_in_anomaly_window,
             "wall_time_s": r.wall_time_s,

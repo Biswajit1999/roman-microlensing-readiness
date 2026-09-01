@@ -4,10 +4,10 @@ parallax, following the standard formalism used throughout the literature:
     A(u)  = (u**2 + 2) / (u * sqrt(u**2 + 4))                    [Paczynski 1986]
     u(t)  = sqrt(tau(t)**2 + beta(t)**2)                          [trajectory]
 
-Parallax (Gould 2004, ApJ 606, 319; the "geocentric"-frame projection is applied
-here in a Sun-centered frame using the observer ephemeris directly, which is the
-convention used by the WFIRST/Roman 2018 Microlensing Data Challenge ephemeris
-files):
+Parallax follows the Gould (2004, ApJ 606, 319) geocentric projection using
+observer coordinates in a declared inertial frame. The 2018 challenge
+ephemeris is barycentric; this utility has not been independently cross-
+validated for scientific inference and is excluded from default results:
 
     tau(t) = (t - t0) / tE + delta_tau(t)
     beta(t) = u0 + delta_beta(t)
@@ -17,7 +17,7 @@ files):
 
     dsN/E(t) = sN/E(t) - sN/E(t0) - (t - t0) * d(sN/E)/dt |_{t0}
 
-where sN(t), sE(t) are the observer's Sun-centered position projected onto the
+where sN(t), sE(t) are the observer's position projected onto the
 North/East tangent-plane basis at the target's (RA, Dec), in AU, and piE is the
 microlensing parallax vector (piEN, piEE) with |piE| = au / rE (Einstein radius
 projected onto the observer plane).
@@ -82,7 +82,8 @@ def parallax_deltas(
     ephem_t : array_like
         Ephemeris sample times, days.
     ephem_xyz : array_like, shape (N, 3)
-        Sun-centered observer position at ephem_t, AU, equatorial (J2000) frame.
+        Observer position at ephem_t in AU. Its origin and frame must match the
+        adopted formalism; the 2018 challenge coordinates are barycentric.
     ra_deg, dec_deg : float
         Target coordinates, degrees.
 

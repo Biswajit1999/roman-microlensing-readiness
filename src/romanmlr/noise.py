@@ -24,7 +24,9 @@ class NoiseConfig:
     sigma_floor_mag: float = 0.003
     sigma_poisson_mag_at_ref: float = 0.01
     mag_ref: float = 21.0
-    poisson_index: float = 0.4  # sigma_poisson ~ sigma_ref * 10**(index*(m-mref))
+    # Photon-limited relative uncertainty scales as flux**-1/2, hence
+    # 10**(0.2 * delta_mag). This remains a phenomenological noise proxy.
+    poisson_index: float = 0.2
     rho_ar1: float = 0.0  # AR(1) correlation coefficient per epoch; 0 = white noise
     red_noise_amp_mag: float = 0.0  # stddev of the AR(1) component
     seed: int = 0

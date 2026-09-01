@@ -14,17 +14,15 @@
 #
 # The cadence/resolution scoping below (2-season cadence, rho=0.02,
 # grid_n=350) is still correct and kept for whoever picks up that issue.
+status: disabled-unvalidated
 channel: planetary
 
 cadence:
-  n_seasons: 2
-  season_length_days: 72
-  season_gap_days: 61
-  cadence_minutes: 15
-  downlink_gap_every_hours: 12
-  downlink_gap_minutes: 40
-  random_dropout_frac: 0.02
-  t0_days: 0
+  survey_definition_id: disabled-diagnostic-only
+  season_start_days: [0.0, 182.625]
+  season_length_days: 70.5
+  cadence_minutes: 12.1
+  random_dropout_frac: 0.0
 
 fixed:
   t0: 30.0

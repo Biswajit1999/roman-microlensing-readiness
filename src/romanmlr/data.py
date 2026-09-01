@@ -124,7 +124,9 @@ def load_master_truth(paths: MDCPaths) -> pd.DataFrame:
 
     # Build a stripped-column index map once, using the first row's token
     # count vs. its '|'-bearing counterpart to locate true column offsets.
-    template_line = next(l for l in text.splitlines() if l.strip() and not l.lstrip().startswith("#"))
+    template_line = next(
+        line for line in text.splitlines() if line.strip() and not line.lstrip().startswith("#")
+    )
     template_tokens = template_line.split()
     stripped_positions = []
     n_stripped = 0

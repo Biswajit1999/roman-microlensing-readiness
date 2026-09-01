@@ -133,6 +133,47 @@ def fit_pspl(
     return best
 
 
+def blind_search_pspl(
+    t: np.ndarray,
+    flux: np.ndarray,
+    sigma: np.ndarray,
+    timescale_grid_days: tuple[float, ...] = (0.1, 0.3, 1.0, 3.0, 10.0, 30.0, 100.0),
+) -> PSPLFitResult:
+    """Search for a PSPL event without access to injected parameters.
+
+    For each predeclared timescale, a boxcar matched-filter supplies a peak
+    epoch. Those data-derived candidates seed the same bounded PSPL fitter.
+    Null and injected light curves use this identical search and trial space.
+    """
+    t = np.asarray(t, dtype=float)
+    flux = np.asarray(flux, dtype=float)
+    sigma = np.asarray(sigma, dtype=float)
+    if t.size < 5 or flux.shape != t.shape or sigma.shape != t.shape:
+        raise ValueError("t, flux, and sigma must be matching arrays with at least five samples")
+    if np.any(sigma <= 0) or np.any(~np.isfinite(sigma)):
+        raise ValueError("sigma must be finite and positive")
+    cadence = float(np.median(np.diff(t)))
+    baseline = float(np.median(flux))
+    standardized = (flux - baseline) / sigma
+    candidates: list[PSPLFitResult] = []
+    for tE in timescale_grid_days:
+        if tE <= 0:
+            raise ValueError("timescale grid values must be positive")
+        width = int(np.clip(round(2.0 * tE / max(cadence, 1e-9)), 1, min(t.size, 2001)))
+        kernel = np.ones(width) / width
+        score = np.convolve(standardized, kernel, mode="same")
+        t0_guess = float(t[int(np.argmax(score))])
+        guess = PSPLParams(t0=t0_guess, u0=0.3, tE=tE)
+        fs0 = max(float(np.percentile(flux, 95) - baseline), 0.1)
+        fitted = fit_pspl(t, flux, sigma, guess, fs0=fs0, fb0=baseline - fs0)
+        if fitted.success and np.isfinite(fitted.chi2):
+            candidates.append(fitted)
+    if not candidates:
+        fallback = PSPLParams(t0=float(t[np.argmax(flux)]), u0=1.0, tE=1.0)
+        return PSPLFitResult(fallback, 1.0, 0.0, np.inf, False)
+    return min(candidates, key=lambda result: result.chi2)
+
+
 def chi2_flat(flux: np.ndarray, sigma: np.ndarray) -> float:
     """Chi2 of the best-fit constant (no lensing) model."""
     weights = 1.0 / sigma**2

@@ -1,6 +1,6 @@
 import numpy as np
 
-from romanmlr.detect import anomaly_delta_chi2, event_delta_chi2, fit_pspl
+from romanmlr.detect import anomaly_delta_chi2, blind_search_pspl, event_delta_chi2, fit_pspl
 from romanmlr.pspl import PSPLParams, flux_model, trajectory
 
 
@@ -22,6 +22,14 @@ def test_fit_recovers_injected_parameters():
     assert abs(fit.params.t0 - truth.t0) < 1.0
     assert abs(fit.params.tE - truth.tE) / truth.tE < 0.1
     assert abs(fit.params.u0 - truth.u0) < 0.02
+
+
+def test_blind_search_recovers_without_truth_seed():
+    t, flux, sigma, truth = _make_light_curve(seed=7, u0=0.1, tE=10.0, t0=23.0)
+    fit = blind_search_pspl(t, flux, sigma)
+    assert fit.success
+    assert abs(fit.params.t0 - truth.t0) < 1.0
+    assert abs(fit.params.tE - truth.tE) / truth.tE < 0.25
 
 
 def test_event_detected_well_above_threshold():

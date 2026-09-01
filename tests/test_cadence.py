@@ -4,9 +4,8 @@ from romanmlr.cadence import CadenceConfig, generate_observation_times
 
 
 def test_observation_times_are_sorted_and_within_baseline():
-    cfg = CadenceConfig(n_seasons=3, season_length_days=10, season_gap_days=5,
-                         cadence_minutes=60, random_dropout_frac=0.0,
-                         downlink_gap_every_hours=1e9)
+    cfg = CadenceConfig(season_start_days=(0, 15, 30), season_length_days=10,
+                        cadence_minutes=60, random_dropout_frac=0.0)
     t = generate_observation_times(cfg)
     assert np.all(np.diff(t) > 0)
     assert t.min() >= 0
@@ -14,9 +13,8 @@ def test_observation_times_are_sorted_and_within_baseline():
 
 
 def test_season_gaps_are_respected():
-    cfg = CadenceConfig(n_seasons=2, season_length_days=10, season_gap_days=20,
-                         cadence_minutes=60, random_dropout_frac=0.0,
-                         downlink_gap_every_hours=1e9)
+    cfg = CadenceConfig(season_start_days=(0, 30), season_length_days=10,
+                        cadence_minutes=60, random_dropout_frac=0.0)
     t = generate_observation_times(cfg)
     gaps = np.diff(t)
     # the single inter-season gap must be much larger than the cadence
@@ -24,8 +22,8 @@ def test_season_gaps_are_respected():
 
 
 def test_dropout_reduces_point_count():
-    kwargs = {"n_seasons": 2, "season_length_days": 10, "season_gap_days": 5,
-              "cadence_minutes": 30, "downlink_gap_every_hours": 1e9}
+    kwargs = {"season_start_days": (0, 15), "season_length_days": 10,
+              "cadence_minutes": 30}
     t_full = generate_observation_times(CadenceConfig(random_dropout_frac=0.0, seed=1, **kwargs))
     t_dropout = generate_observation_times(CadenceConfig(random_dropout_frac=0.3, seed=1, **kwargs))
     assert t_dropout.size < t_full.size

@@ -1,33 +1,32 @@
-# Default injection-recovery experiment: free-floating-planet (FFP) channel
-# under a Penny-et-al.-(2019)-like Roman GBTDS cadence. See docs/METHODS.md
-# for the full experimental design and docs/DATA_SOURCES.md for parameter
-# provenance.
-#
-# The grid spans source brightness (mag_ref) as well as impact parameter and
-# Einstein-crossing time, because brightness (crowding/blending proxy) is a
-# first-order driver of Roman GBTDS microlensing completeness alongside
-# event geometry -- a grid that only varies u0/tE at one fixed, bright
-# magnitude does not probe the actual detection boundary (see
-# docs/CLAIMS.md item 9 and the run history in results/default/).
+# Exploratory synthetic point-lens experiment. This is not an official Roman
+# survey simulation and must not be described as mission completeness.
+experiment_id: synthetic-point-lens-recovery-v0.4
+scope: conditional synthetic recovery under the declared cadence/noise proxy
 channel: ffp
 
 cadence:
-  n_seasons: 6
-  season_length_days: 72
-  season_gap_days: 61
-  cadence_minutes: 15
-  downlink_gap_every_hours: 12
-  downlink_gap_minutes: 40
-  random_dropout_frac: 0.02
-  t0_days: 0
+  survey_definition_id: roman-gbtds-public-design-2026-08
+  season_start_days: [0.0, 182.625, 365.25, 1278.375, 1461.0, 1643.625]
+  season_length_days: 70.5
+  cadence_minutes: 12.1
+  primary_filter: F146
+  n_tiles: 6
+  random_dropout_frac: 0.0
+
+noise:
+  sigma_floor_mag: 0.003
+  sigma_poisson_mag_at_ref: 0.01
+  mag_ref: 21.0
+  poisson_index: 0.2
+  rho_ar1: 0.0
+  red_noise_amp_mag: 0.0
 
 fixed:
-  t0: 30.0
+  t0: null
   fs: 1.0
   fb: 0.0
   rho: 0.005
   detection_threshold: 500.0
-  anomaly_threshold: 160.0
 
 grid:
   mag_ref: [19.0, 22.0, 24.0, 25.5]
