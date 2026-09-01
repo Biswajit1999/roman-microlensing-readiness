@@ -1,0 +1,21 @@
+# Fast software smoke test, not a scientific result.
+experiment_id: software-smoke-test-v0.4
+scope: software verification only
+channel: ffp
+cadence:
+  survey_definition_id: test-two-season-proxy
+  season_start_days: [0.0, 15.0]
+  season_length_days: 10.0
+  cadence_minutes: 30.0
+  random_dropout_frac: 0.0
+fixed:
+  t0: null
+  mag_ref: 19.5
+  fs: 1.0
+  fb: 0.0
+  detection_threshold: 500.0
+grid:
+  u0: [0.05, 0.5]
+  tE: [0.5, 2.0]
+  rho: [0.01]
+n_seeds_per_point: 2

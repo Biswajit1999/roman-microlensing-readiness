@@ -1,0 +1,9 @@
+{
+  "n_trials": 10,
+  "n_false_positive": 0,
+  "fpr": 0.0,
+  "ci_low": 0.0,
+  "ci_high": 0.2775327998628892,
+  "scope": "simple synthetic null under declared cadence/noise proxy",
+  "threshold": 500.0
+}
