@@ -27,7 +27,10 @@ RUBRIC = [
 
 
 def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    # Git can materialize text files with CRLF or LF depending on checkout
+    # settings. Hash canonical LF bytes so provenance checks are portable.
+    canonical = path.read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(canonical).hexdigest()
 
 
 def _endpoint_summary(frame: pd.DataFrame, column: str) -> dict:

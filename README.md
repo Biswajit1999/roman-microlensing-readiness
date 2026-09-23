@@ -1,7 +1,7 @@
 # Synthetic Point-Lens Microlensing Recovery Study
 
 [![CI](https://github.com/Biswajit1999/roman-microlensing-readiness/actions/workflows/ci.yml/badge.svg)](https://github.com/Biswajit1999/roman-microlensing-readiness/actions/workflows/ci.yml)
-[![release](https://img.shields.io/badge/release-v0.5.0-176b87)](CHANGELOG.md)
+[![release](https://img.shields.io/badge/release-v0.5.1-176b87)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 An independently implemented, blind injection/recovery experiment for

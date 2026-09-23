@@ -10,4 +10,4 @@ events with known injected ground truth; the historical 2018 challenge adapter
 is optional and is not a current Roman flight-data product.
 """
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
