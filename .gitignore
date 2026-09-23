@@ -9,6 +9,8 @@ build/
 dist/
 data/cache/
 results/smoke/
+results/audit-smoke-*/
+results/v0.5.0/
 .venv/
 venv/
 .ipynb_checkpoints/

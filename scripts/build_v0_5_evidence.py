@@ -56,7 +56,11 @@ def _edge_class(values: pd.Series) -> pd.Categorical:
 
 
 def _write_recovery_figure(table: pd.DataFrame, output: Path) -> None:
-    plt.rcParams.update({"font.family": "DejaVu Sans", "svg.fonttype": "none"})
+    plt.rcParams.update({
+        "font.family": "DejaVu Sans",
+        "svg.fonttype": "none",
+        "svg.hashsalt": "romanmlr-v0.5",
+    })
     colors = {19.0: "#2364aa", 22.0: "#7b2cbf", 24.0: "#c44536"}
     markers = {"event_detected": "o", "parameters_recovered": "s"}
     labels = {"event_detected": "detected", "parameters_recovered": "parameters recovered"}
@@ -134,12 +138,22 @@ def _write_rubric(output_json: Path, output_svg: Path) -> None:
     plt.close(fig)
 
 
-def build(trials_path: Path, null_summary_path: Path, output: Path) -> None:
+def build(
+    trials_path: Path,
+    null_trials_path: Path,
+    null_summary_path: Path,
+    output: Path,
+) -> None:
     output.mkdir(parents=True, exist_ok=True)
     figures = output.parent / "results" / "figures"
     figures.mkdir(parents=True, exist_ok=True)
     trials = pd.read_csv(trials_path)
+    null_trials = pd.read_csv(null_trials_path)
     null_summary = json.loads(null_summary_path.read_text())
+    if len(null_trials) != null_summary["n_trials"]:
+        raise ValueError("null trial count does not match null summary")
+    if int(null_trials["event_detected"].sum()) != null_summary["n_false_positive"]:
+        raise ValueError("null trigger count does not match null summary")
 
     primary = recovery_by_endpoint(trials, ["mag_ref", "tE"])
     primary.to_csv(output / "recovery_by_magnitude_timescale.csv", index=False)
@@ -158,6 +172,7 @@ def build(trials_path: Path, null_summary_path: Path, output: Path) -> None:
         "scope": "conditional synthetic point-lens recovery; not mission completeness or yield",
         "input_sha256": {
             str(trials_path.as_posix()): _sha256(trials_path),
+            str(null_trials_path.as_posix()): _sha256(null_trials_path),
             str(null_summary_path.as_posix()): _sha256(null_summary_path),
         },
         "n_injections": len(trials),
@@ -179,10 +194,11 @@ def build(trials_path: Path, null_summary_path: Path, output: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--trials", type=Path, required=True)
+    parser.add_argument("--null-trials", type=Path, required=True)
     parser.add_argument("--null-summary", type=Path, required=True)
     parser.add_argument("--out", type=Path, default=Path("research"))
     args = parser.parse_args()
-    build(args.trials, args.null_summary, args.out)
+    build(args.trials, args.null_trials, args.null_summary, args.out)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,41 @@
+{
+  "scope": "conditional synthetic point-lens recovery; not mission completeness or yield",
+  "input_sha256": {
+    "results/v0.5.0-release/trials.csv": "337b0074c6da8b778b5d6e43a981973b87954ff140b57d603fec40cfbd155b44",
+    "results/v0.5.0-null/null_trials.csv": "7f98ba1231390f9b3e3bd5cc0825d529aa83cb22e480a105b1c726e7fae4f27d",
+    "results/v0.5.0-null/null_summary.json": "a9aede9b6de680f84946954597b22a52b20d471363ded7d2a9276a0ae105c73f"
+  },
+  "n_injections": 900,
+  "event_detection": {
+    "n": 900,
+    "k": 864,
+    "fraction": 0.96,
+    "ci_low": 0.9451210041792689,
+    "ci_high": 0.9709688608290811
+  },
+  "parameter_recovery": {
+    "n": 900,
+    "k": 710,
+    "fraction": 0.7888888888888889,
+    "ci_low": 0.7610276194296565,
+    "ci_high": 0.8142945180152011
+  },
+  "parameter_recovery_given_detection": {
+    "n": 864,
+    "k": 710,
+    "fraction": 0.8217592592592593,
+    "ci_low": 0.7948325505821702,
+    "ci_high": 0.8458374639105067
+  },
+  "fit_failures": 11,
+  "unique_master_seeds": 900,
+  "null_test": {
+    "n_trials": 1000,
+    "n_false_positive": 0,
+    "fpr": 0.0,
+    "ci_low": 2.168404344971009e-19,
+    "ci_high": 0.0038267584855551234,
+    "scope": "simple synthetic null under declared cadence/noise proxy",
+    "threshold": 500.0
+  }
+}

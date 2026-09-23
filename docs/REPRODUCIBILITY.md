@@ -1,24 +1,66 @@
 # Reproducibility
 
+## Environment and verification
+
 ```bash
 git clone https://github.com/Biswajit1999/roman-microlensing-readiness.git
 cd roman-microlensing-readiness
 python -m pip install -e ".[dev]"
 pytest -q
-
-romanmlr run-grid --config configs/smoke_test.yaml --out results/post_audit_smoke
-romanmlr null-fpr --config configs/smoke_test.yaml --out results/post_audit_null --n-trials 50
+ruff check src tests scripts
 ```
 
-The grid writes `trials.csv`, `conditional_recovery.csv`, `config.yaml`, and
-`manifest.json`. The null run writes every searched realization to
-`null_trials.csv`, plus `null_summary.json`, the config, and manifest. Null and
-injection searches use the same blind event finder.
+The v0.5 release was verified with 39 passing tests (one network test excluded
+by default) on Python 3.12. CI also tests Python 3.10 and 3.12, lints the source,
+and runs the CLI smoke workflow.
 
-`configs/default.yaml` defines the larger exploratory grid. Do not overwrite a
-run directory. Use a new version-labelled path and review raw fit parameters,
-failed fits, selection counts, confidence intervals, and the manifest before
-quoting any aggregate.
+## Recreate the v0.5 experiment
 
-`configs/planetary.yaml` is deliberately disabled and the CLI will reject it.
-This is a reproducible safety property, not an unfinished documentation note.
+```bash
+romanmlr run-grid \
+  --config configs/cadence_phase_v0.5.yaml \
+  --out results/v0.5.0-release
+
+romanmlr null-fpr \
+  --config configs/cadence_phase_v0.5.yaml \
+  --out results/v0.5.0-null \
+  --n-trials 1000
+
+python scripts/build_v0_5_evidence.py \
+  --trials results/v0.5.0-release/trials.csv \
+  --null-trials results/v0.5.0-null/null_trials.csv \
+  --null-summary results/v0.5.0-null/null_summary.json \
+  --out research
+```
+
+On the recorded Windows host, the 900-trial run had a median per-trial time of
+0.228 s, a 99th percentile of 29.9 s, and a 41.4 s maximum. The distribution
+is strongly right-skewed, so allow about 25 minutes for a serial replay. The
+null run is separate and can run concurrently on another core.
+
+## Outputs and integrity
+
+The injection directory contains:
+
+- `trials.csv`: one raw row per injection, including all master/child seeds;
+- `conditional_recovery.csv`: backward-compatible detection endpoint table;
+- `recovery_by_endpoint.csv`: detection and parameter endpoints kept separate;
+- `run_summary.json`: overall numerators, denominators, intervals, failures;
+- `config.yaml` and `manifest.json`: exact inputs and execution provenance.
+
+The null directory contains every searched realization in `null_trials.csv`,
+its `null_summary.json`, copied config, and manifest. Both manifests record
+clean source commit `4dfb89f01df8877e32b2f3af0437505167418b3d`, the same
+config SHA-256, runtime, dependency versions, and RNG declaration.
+
+`research/result_summary.json` records SHA-256 digests of the two primary input
+artifacts. The evidence script derives every CSV and SVG; no plotted value is
+typed into a figure by hand.
+
+Do not overwrite a run directory during a replication attempt. Use a new path,
+compare all scientific columns, and expect `wall_time_s` to differ. A clean
+pre-release replay matched all 900 scientific rows bit-for-bit; only wall time
+changed.
+
+`configs/planetary.yaml` is deliberately disabled and the CLI rejects it. This
+is a reproducible safety property, not an unfinished documentation note.

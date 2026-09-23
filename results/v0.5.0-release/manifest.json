@@ -1,0 +1,17 @@
+{
+  "experiment_id": "cadence-phase-identifiability-v0.5.0",
+  "scope": "conditional synthetic recovery under the declared cadence and white-noise proxy",
+  "git_commit": "4dfb89f01df8877e32b2f3af0437505167418b3d",
+  "git_dirty": false,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "dependencies": {
+    "numpy": "2.3.5",
+    "scipy": "1.18.1",
+    "pandas": "3.0.1",
+    "pyyaml": "6.0.3",
+    "click": "8.5.0"
+  },
+  "rng": "numpy.random.Generator(PCG64), one seed per trial",
+  "config_sha256": "5d8d3f660e42aa2b989b2be8673241ce7d855ff7060a7b78bf8226f8dd83c6bf"
+}

@@ -1,9 +1,8 @@
 # Validation
 
-Every physical model in this repository is checked against at least one
-independent, analytically known quantity -- never only against itself.
-This file summarizes what was checked, how, and the result; the
-authoritative, re-runnable checks are the pytest suite referenced below.
+Each claimed physical-model pathway is checked against an analytically known
+quantity where available. The failed binary-lens validation is preserved and
+that pathway is disabled rather than described as validated.
 
 | Model | Check | Method | Test | Result (2026-08-28) |
 |---|---|---|---|---|
@@ -21,7 +20,23 @@ authoritative, re-runnable checks are the pytest suite referenced below.
 | Wilson-score interval | k=0, k=n, k=n/2 edge cases; interval narrows with more trials | Hand-verified statistics | `tests/test_completeness.py` | Pass |
 | Data adapter (`event_info.txt`, `master_file.txt` parser) | Parses real, verbatim excerpts of the public Data Challenge answer key correctly, including all four event classes | Fixture built from real upstream data | `tests/test_data_adapter.py` | Pass |
 | Data adapter (full dataset) | Full 293-row `Answers/master_file.txt` parses to exactly the published per-class counts (74/83/43/93) | Manual one-off run against the live upstream file, 2026-08-28 | not yet wired into CI as an automated network test beyond `test_real_download_and_manifest` | 293/293 rows parsed; class counts 74 (dcnormffp), 83 (ombin), 43 (omcassan), 93 (dccv) match Penny et al.'s published dataset description exactly |
-| End-to-end pipeline | CLI `run-grid` on `configs/smoke_test.yaml` produces physically sensible trends (higher tE / smaller u0 -> higher recovered delta-chi2; an in-season vs. in-gap `t0` changes `n_points_in_anomaly_window` as expected) | Manual run, 2026-08-28 | `configs/smoke_test.yaml` | Confirmed by inspection of `results/smoke/trials.csv` during development; see git history |
+| Blind search | Recovers a high-S/N event without access to injected t0, u0, or tE | Synthetic recovery | `tests/test_detect.py::test_blind_search_recovers_without_truth_seed` | Pass |
+| Endpoint separation | Detection and parameter recovery remain separate numerators | Constructed table | `tests/test_completeness.py::test_recovery_by_endpoint_keeps_detection_and_identification_separate` | Pass |
+| RNG allocation | Seeds are stable across reruns, differ by parameters/replicate, and split into independent streams | Deterministic construction | `tests/test_cli.py`, `tests/test_injection_recovery.py` | Pass |
+| End-to-end pipeline | CLI smoke run writes unique raw seeds, endpoint tables, summary, config, and manifest | Temporary directory integration test | `tests/test_cli.py::test_run_grid_writes_endpoint_and_provenance_outputs` | Pass |
+
+## v0.5 release validation (2026-09-23)
+
+- 39 tests pass and one opt-in network test is deselected; Ruff reports no
+  findings across `src`, `tests`, and `scripts`.
+- The 900-trial release run and the 1,000-null run both record clean source
+  commit `4dfb89f01df8877e32b2f3af0437505167418b3d` and identical config
+  SHA-256 `5d8d3f660e42aa2b989b2be8673241ce7d855ff7060a7b78bf8226f8dd83c6bf`.
+- A pre-release replay matches all 900 scientific columns bit-for-bit; only
+  `wall_time_s` differs, as expected.
+- All 900 master, cadence, event-epoch, and noise seeds are unique.
+- The evidence builder hashes its input trial and null-summary files and
+  regenerates the summary tables and both SVG figures.
 
 ## Open validation failure: bound-planet-channel population grid (2026-08-28)
 
@@ -82,7 +97,7 @@ because of this open issue.
 ## Reproducing these checks
 
 ```bash
-pytest -q                 # fast checks (< 10 s)
-pytest -q -m slow          # ray-shooting binary-lens limit checks (< 5 s)
+pytest -q                  # 39 local tests, including the preserved negative result
+ruff check src tests scripts
 pytest -q -m network       # live download + full-dataset parse (requires internet)
 ```

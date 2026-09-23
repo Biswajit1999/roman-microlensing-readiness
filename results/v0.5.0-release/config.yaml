@@ -1,0 +1,41 @@
+# Predeclared v0.5 experiment: conditional recovery and parameter
+# identifiability for isolated synthetic point lenses. This is not a Roman
+# yield, readiness, or population-completeness forecast.
+experiment_id: cadence-phase-identifiability-v0.5.0
+scope: conditional synthetic recovery under the declared cadence and white-noise proxy
+channel: ffp
+search_timescale_grid_days: [0.02, 0.08, 0.3, 1.0, 3.0]
+null_mag_ref: 22.0
+
+cadence:
+  survey_definition_id: roman-gbtds-public-design-2026-09
+  season_start_days: [0.0, 182.625, 365.25, 1278.375, 1461.0, 1643.625]
+  season_length_days: 70.5
+  cadence_minutes: 12.1
+  primary_filter: F146
+  n_tiles: 6
+  random_dropout_frac: 0.0
+
+noise:
+  sigma_floor_mag: 0.003
+  sigma_poisson_mag_at_ref: 0.01
+  mag_ref: 21.0
+  poisson_index: 0.2
+  rho_ar1: 0.0
+  red_noise_amp_mag: 0.0
+
+fixed:
+  t0: null
+  fs: 1.0
+  fb: 0.0
+  rho: 0.005
+  detection_threshold: 500.0
+
+grid:
+  mag_ref: [19.0, 22.0, 24.0]
+  u0: [0.1, 0.6, 1.0]
+  tE: [0.02, 0.08, 0.3, 1.0]
+
+# 36 cells x 25 independent parameter-aware seeds = 900 injections. Primary
+# summaries pool u0 within each (magnitude, tE) cell: n=75 per reported cell.
+n_seeds_per_point: 25

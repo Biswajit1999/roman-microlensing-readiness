@@ -1,0 +1,71 @@
+{
+  "name": "explicit repository research-quality audit rubric",
+  "scale": "0-10 per dimension; expert heuristic, not a user study or scientific metric",
+  "before_ref": "v0.3.0",
+  "after_ref": "v0.5.0",
+  "dimensions": [
+    {
+      "dimension": "Claim integrity",
+      "before": 3,
+      "after": 10,
+      "evidence": "mission-level wording replaced by a scoped estimand"
+    },
+    {
+      "dimension": "Blind inference",
+      "before": 2,
+      "after": 9,
+      "evidence": "truth-seeded fitting replaced by a blind matched-filter search"
+    },
+    {
+      "dimension": "Experimental power",
+      "before": 2,
+      "after": 8,
+      "evidence": "five repeats per cell replaced by 900 injections"
+    },
+    {
+      "dimension": "RNG independence",
+      "before": 2,
+      "after": 10,
+      "evidence": "parameter-aware seeds and independent random streams"
+    },
+    {
+      "dimension": "Provenance",
+      "before": 4,
+      "after": 10,
+      "evidence": "raw rows, copied config, hashes, dependency and git manifest"
+    },
+    {
+      "dimension": "Negative results",
+      "before": 6,
+      "after": 10,
+      "evidence": "invalid planetary path preserved and runtime-disabled"
+    },
+    {
+      "dimension": "Verification",
+      "before": 7,
+      "after": 10,
+      "evidence": "unit, physics, CLI, schema, and CI checks"
+    },
+    {
+      "dimension": "Reproducibility",
+      "before": 6,
+      "after": 10,
+      "evidence": "one-command runs and generated evidence outputs"
+    },
+    {
+      "dimension": "Performance",
+      "before": 4,
+      "after": 9,
+      "evidence": "time-aware proposal plus bounded local fit"
+    },
+    {
+      "dimension": "Evidence clarity",
+      "before": 3,
+      "after": 9,
+      "evidence": "endpoint-separated tables, intervals, and figures"
+    }
+  ],
+  "total_before": 39,
+  "total_after": 95,
+  "maximum": 100
+}

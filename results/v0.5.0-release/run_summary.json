@@ -1,0 +1,16 @@
+{
+  "n_trials": 900,
+  "n_fit_failures": 11,
+  "event_detected": {
+    "n_success": 864,
+    "fraction": 0.96,
+    "ci_low": 0.9451210041792689,
+    "ci_high": 0.9709688608290811
+  },
+  "parameters_recovered": {
+    "n_success": 710,
+    "fraction": 0.7888888888888889,
+    "ci_low": 0.7610276194296565,
+    "ci_high": 0.8142945180152011
+  }
+}

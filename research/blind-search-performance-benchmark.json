@@ -1,0 +1,32 @@
+{
+  "scope": "single deterministic full-cadence trial; diagnostic, not a population benchmark",
+  "input": {
+    "channel": "ffp",
+    "u0": 0.3,
+    "tE_days": 0.3,
+    "rho": 0.005,
+    "mag_ref": 22.0,
+    "master_seed": 0
+  },
+  "before": {
+    "ref": "0d04ac3 pre-optimization working tree",
+    "elapsed_s": 68.4153891,
+    "event_delta_chi2": 206759.91894347034,
+    "fitted_t0": 1662.6452974363326,
+    "fitted_u0": 0.2898398194955937,
+    "fitted_tE": 0.30752509696735386
+  },
+  "after": {
+    "ref": "matched-filter proposal before RNG-stream refactor",
+    "elapsed_s": 0.1427962,
+    "event_delta_chi2": 206758.1524975053,
+    "fitted_t0": 1662.645297170054,
+    "fitted_u0": 0.28999572553034497,
+    "fitted_tE": 0.30738604315006884
+  },
+  "derived": {
+    "speedup": 479.111,
+    "relative_delta_chi2_change": 0.0000085445
+  },
+  "caveat": "The released 900-trial run has a 0.228 s median, 29.9 s 99th percentile, and 41.4 s maximum; this bright-case speedup must not be generalized to boundary fits."
+}

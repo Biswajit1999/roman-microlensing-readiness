@@ -17,6 +17,9 @@ All notable changes to this project are documented here. Format follows
 - Added endpoint-separated recovery tables, overall run summaries, evidence
   generation, a before/after audit rubric, and end-to-end CLI tests.
 - Corrected CI to check the post-audit output filenames.
+- Published the clean-commit result: 864/900 detections, 710/900 parameter
+  recoveries, 11 retained fit failures, and 0/1,000 triggers under the scoped
+  constant-flux null; all proportions include Wilson 95% intervals.
 
 ## [0.4.0] - 2026-09-01
 

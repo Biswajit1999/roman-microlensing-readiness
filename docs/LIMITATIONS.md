@@ -17,11 +17,23 @@
 - The blind search uses a finite predeclared timescale bank followed by bounded
   least squares. It is neither a production alert system nor a global posterior
   sampler, and its threshold is not mission-calibrated.
+- The v0.5 grid is balanced across a small hand-declared parameter set. It is
+  not drawn from a Galactic population, does not integrate over an occurrence
+  model, and therefore does not estimate mission completeness or yield.
 - A threshold crossing means “event detected.” Accuracy of `t0`, `u0`, and
   `tE` is separately evaluated with declared tolerances.
+- Eleven of 900 v0.5 fits failed and are counted as non-detections rather than
+  dropped. Runtime is heavy-tailed (0.228 s median, 29.9 s 99th percentile,
+  41.4 s maximum on the recorded host). The serial runner does not yet
+  checkpoint or parallelize trials.
+- Cadence-support and season-edge subgroup summaries are descriptive. Their
+  factors are not independently randomized, cell sizes can be small, and no
+  multiplicity correction is applied; they are hypothesis-generating, not
+  causal estimates.
 - Pure Gaussian/AR(1) constant-flux nulls omit variable stars, detector
   artifacts, blends, and non-microlensing transients. Their rate is an internal
-  pipeline diagnostic only.
+  pipeline diagnostic only. Zero triggers in 1,000 trials constrains the rate
+  under that simple null; it does not establish a zero false-positive rate.
 - The parallax utility consumes observer coordinates in an inertial frame, but
   has not been cross-validated against an independent microlensing package for
   the supplied barycentric ephemeris. It is excluded from default claims.
