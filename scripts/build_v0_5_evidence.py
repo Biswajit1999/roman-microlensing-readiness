@@ -55,6 +55,13 @@ def _edge_class(values: pd.Series) -> pd.Categorical:
     )
 
 
+def _save_svg(fig: plt.Figure, output: Path) -> None:
+    """Write deterministic, diff-clean SVG output."""
+    fig.savefig(output, format="svg", metadata={"Date": None})
+    lines = output.read_text(encoding="utf-8").splitlines()
+    output.write_text("\n".join(line.rstrip() for line in lines) + "\n", encoding="utf-8")
+
+
 def _write_recovery_figure(table: pd.DataFrame, output: Path) -> None:
     plt.rcParams.update({
         "font.family": "DejaVu Sans",
@@ -94,7 +101,7 @@ def _write_recovery_figure(table: pd.DataFrame, output: Path) -> None:
         "Not a Roman yield or mission-completeness forecast.",
         fontsize=8, color="#4a5560",
     )
-    fig.savefig(output, format="svg", metadata={"Date": None})
+    _save_svg(fig, output)
     plt.close(fig)
 
 
@@ -134,7 +141,7 @@ def _write_rubric(output_json: Path, output_svg: Path) -> None:
         f"{payload['total_after']}/{payload['maximum']}. Not a peer-review score.",
         fontsize=8, color="#4a5560",
     )
-    fig.savefig(output_svg, format="svg", metadata={"Date": None})
+    _save_svg(fig, output_svg)
     plt.close(fig)
 
 
