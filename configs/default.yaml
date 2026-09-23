@@ -3,6 +3,7 @@
 experiment_id: synthetic-point-lens-recovery-v0.4
 scope: conditional synthetic recovery under the declared cadence/noise proxy
 channel: ffp
+search_timescale_grid_days: [0.02, 0.08, 0.3, 1.0, 3.0]
 
 cadence:
   survey_definition_id: roman-gbtds-public-design-2026-08

@@ -53,6 +53,19 @@
 
 ## Roman GBTDS survey-design references (not data; used for cadence parameters)
 
+- NASA Roman, "Galactic Bulge Time-Domain Survey":
+  <https://roman.gsfc.nasa.gov/science/Galactic_Bulge_Time_Domain_Survey.html>
+  (accessed 2026-09-23; public design states 12.1-minute F146 sampling over
+  six high-cadence seasons, three early and three late).
+- NASA Roman, "Core Community Surveys":
+  <https://roman.gsfc.nasa.gov/science/Observing_Programs_and_Surveys.html>
+  (accessed 2026-09-23; records the April 2025 ROTAC recommendation and notes
+  that the first high-cadence season may be modestly reduced).
+- Roman Observations Time Allocation Committee report, 2025-04-24:
+  <https://roman.gsfc.nasa.gov/science/ccs/ROTAC-Report-20250424-v3.pdf>
+  (the overguide 70.5-day season duration is a recommendation pending precise
+  scheduling, not an as-flown timeline).
+
 - Penny, M. T., et al. (2019), "Predictions of the Nancy Grace Roman Space
   Telescope Galactic Exoplanet Survey I," ApJS, 241, 3.
 - Johnson, S. A., et al. (2020), "Predictions of the Nancy Grace Roman Space

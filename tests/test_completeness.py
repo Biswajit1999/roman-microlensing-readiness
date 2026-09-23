@@ -1,7 +1,12 @@
 import pandas as pd
 import pytest
 
-from romanmlr.completeness import completeness_by_bin, false_positive_rate, wilson_interval
+from romanmlr.completeness import (
+    completeness_by_bin,
+    false_positive_rate,
+    recovery_by_endpoint,
+    wilson_interval,
+)
 
 
 def test_wilson_interval_known_values():
@@ -52,3 +57,16 @@ def test_false_positive_rate_from_null_trials():
     assert result["n_false_positive"] == 5
     assert result["fpr"] == pytest.approx(0.05)
     assert result["ci_low"] < 0.05 < result["ci_high"]
+
+
+def test_recovery_by_endpoint_keeps_detection_and_identification_separate():
+    df = pd.DataFrame(
+        {
+            "tE": [0.1, 0.1, 0.1],
+            "event_detected": [True, True, False],
+            "parameters_recovered": [True, False, False],
+        }
+    )
+    out = recovery_by_endpoint(df, ["tE"]).set_index("endpoint")
+    assert out.loc["event_detected", "n_success"] == 2
+    assert out.loc["parameters_recovered", "n_success"] == 1

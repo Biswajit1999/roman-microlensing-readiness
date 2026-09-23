@@ -32,4 +32,6 @@ jobs:
         run: |
           romanmlr run-grid --config configs/smoke_test.yaml --out results/ci-smoke
           test -s results/ci-smoke/trials.csv
-          test -s results/ci-smoke/completeness.csv
+          test -s results/ci-smoke/conditional_recovery.csv
+          test -s results/ci-smoke/recovery_by_endpoint.csv
+          test -s results/ci-smoke/run_summary.json

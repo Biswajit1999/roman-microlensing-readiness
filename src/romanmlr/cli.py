@@ -1,10 +1,10 @@
 """Command-line workflow for the synthetic point-lens recovery study."""
 from __future__ import annotations
 
+import hashlib
 import importlib.metadata
 import itertools
 import json
-import hashlib
 import platform
 import shutil
 import subprocess
@@ -18,7 +18,12 @@ import pandas as pd
 import yaml
 
 from .cadence import CadenceConfig, generate_observation_times
-from .completeness import completeness_by_bin, false_positive_rate
+from .completeness import (
+    completeness_by_bin,
+    false_positive_rate,
+    recovery_by_endpoint,
+    wilson_interval,
+)
 from .data import MDCPaths, load_event_info, load_master_truth
 from .detect import blind_search_pspl, event_delta_chi2
 from .injection_recovery import TrialConfig, run_grid
@@ -65,6 +70,30 @@ def _manifest(spec: dict) -> dict:
     }
 
 
+def _stable_trial_seed(experiment_id: str, params: dict, replicate: int) -> int:
+    """Return a stable, parameter-aware 32-bit seed for one grid trial."""
+    payload = json.dumps(
+        {"experiment_id": experiment_id, "params": params, "replicate": replicate},
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
+    return int.from_bytes(hashlib.sha256(payload).digest()[:4], "big")
+
+
+def _run_summary(df: pd.DataFrame) -> dict:
+    summary = {"n_trials": len(df), "n_fit_failures": int((~df["fit_success"]).sum())}
+    for endpoint in ("event_detected", "parameters_recovered"):
+        k = int(df[endpoint].sum())
+        point, low, high = wilson_interval(k, len(df))
+        summary[endpoint] = {
+            "n_success": k,
+            "fraction": point,
+            "ci_low": low,
+            "ci_high": high,
+        }
+    return summary
+
+
 def _record_run_inputs(spec: dict, config_path: str, out: Path) -> None:
     shutil.copy2(config_path, out / "config.yaml")
     manifest = _manifest(spec)
@@ -103,12 +132,16 @@ def run_grid_cmd(config_path: str, out_dir: str) -> None:
     grid = spec["grid"]
     axes = list(grid)
     configs = []
+    experiment_id = str(spec.get("experiment_id", "unspecified"))
+    search_grid = tuple(spec.get("search_timescale_grid_days", (0.02, 0.08, 0.3, 1.0, 3.0)))
     for combo in itertools.product(*[grid[a] for a in axes]):
         params = dict(zip(axes, combo))
-        for seed in range(int(spec.get("n_seeds_per_point", 1))):
+        for replicate in range(int(spec.get("n_seeds_per_point", 1))):
+            seed = _stable_trial_seed(experiment_id, {**spec.get("fixed", {}), **params}, replicate)
             configs.append(
                 TrialConfig(
                     channel=spec["channel"], cadence=cadence, noise=noise, seed=seed,
+                    search_timescale_grid_days=search_grid,
                     **{**spec.get("fixed", {}), **params},
                 )
             )
@@ -118,6 +151,8 @@ def run_grid_cmd(config_path: str, out_dir: str) -> None:
     bin_cols = [a for a in axes if a in df.columns]
     if bin_cols:
         completeness_by_bin(df, bin_cols).to_csv(out / "conditional_recovery.csv", index=False)
+        recovery_by_endpoint(df, bin_cols).to_csv(out / "recovery_by_endpoint.csv", index=False)
+    (out / "run_summary.json").write_text(json.dumps(_run_summary(df), indent=2) + "\n")
     _record_run_inputs(spec, config_path, out)
     click.echo(f"Wrote {out/'trials.csv'} ({len(df)} trials)")
 
@@ -132,18 +167,31 @@ def null_fpr_cmd(config_path: str, out_dir: str, n_trials: int) -> None:
     cadence = _cadence(spec)
     base_noise = _noise(spec)
     threshold = float(spec.get("fixed", {}).get("detection_threshold", 500.0))
-    mag_ref = float(spec.get("fixed", {}).get("mag_ref", 21.0))
+    mag_ref = float(spec.get("null_mag_ref", spec.get("fixed", {}).get("mag_ref", 21.0)))
+    search_grid = tuple(spec.get("search_timescale_grid_days", (0.02, 0.08, 0.3, 1.0, 3.0)))
     rows = []
-    for seed in range(n_trials):
-        t = generate_observation_times(CadenceConfig(**{**asdict(cadence), "seed": seed}))
-        noise = NoiseConfig(**{**asdict(base_noise), "seed": seed})
+    experiment_id = str(spec.get("experiment_id", "unspecified"))
+    for replicate in range(n_trials):
+        seed = _stable_trial_seed(experiment_id, {"null": True}, replicate)
+        cadence_child, noise_child = np.random.SeedSequence(seed).spawn(2)
+        cadence_seed = int(cadence_child.generate_state(1, dtype=np.uint32)[0])
+        noise_seed = int(noise_child.generate_state(1, dtype=np.uint32)[0])
+        t = generate_observation_times(CadenceConfig(**{**asdict(cadence), "seed": cadence_seed}))
+        noise = NoiseConfig(**{**asdict(base_noise), "seed": noise_seed})
         mag, sigma_mag = add_noise(np.full(t.size, mag_ref), noise)
         flux = 10 ** (-0.4 * (mag - mag_ref))
         sigma_flux = np.maximum(np.abs(flux * np.log(10) * 0.4 * sigma_mag), 1e-6)
-        fit = blind_search_pspl(t, flux, sigma_flux)
+        fit = blind_search_pspl(t, flux, sigma_flux, timescale_grid_days=search_grid)
         statistic = event_delta_chi2(fit, flux, sigma_flux)
-        rows.append({"seed": seed, "event_delta_chi2": statistic,
-                     "event_detected": statistic > threshold})
+        rows.append({
+            "replicate": replicate,
+            "seed": seed,
+            "cadence_seed": cadence_seed,
+            "noise_seed": noise_seed,
+            "event_delta_chi2": statistic,
+            "event_detected": bool(fit.success and statistic > threshold),
+            "fit_success": bool(fit.success),
+        })
     df = pd.DataFrame(rows)
     summary = false_positive_rate(df)
     summary["scope"] = "simple synthetic null under declared cadence/noise proxy"

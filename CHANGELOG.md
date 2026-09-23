@@ -4,6 +4,20 @@ All notable changes to this project are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning follows
 [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-09-23
+
+- Replaced the expensive fit-per-timescale blind search with a time-aware
+  matched-filter proposal followed by one bounded local fit; the final χ² is
+  still evaluated on every epoch.
+- Added a predeclared 900-injection cadence-phase and identifiability design,
+  with 75 trials in each primary `(magnitude, tE)` summary cell.
+- Made grid seeds parameter-aware and split cadence, event-epoch, and noise
+  randomness into independently recorded deterministic streams.
+- Added cadence-support and season-edge diagnostics to every raw trial.
+- Added endpoint-separated recovery tables, overall run summaries, evidence
+  generation, a before/after audit rubric, and end-to-end CLI tests.
+- Corrected CI to check the post-audit output filenames.
+
 ## [0.4.0] - 2026-09-01
 
 - Reframed the display title as a scoped synthetic point-lens recovery study.

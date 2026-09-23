@@ -18,6 +18,9 @@ def test_bright_high_snr_ffp_event_is_recovered():
     assert result.event_detected
     assert result.parameters_recovered
     assert result.failure_reason == "event_detected_parameters_recovered"
+    assert result.cadence_seed != result.epoch_seed != result.noise_seed
+    assert result.n_epochs_within_tE > 0
+    assert result.nearest_epoch_minutes >= 0
 
 
 def test_faint_shallow_event_is_not_recovered():
@@ -38,6 +41,7 @@ def test_null_trial_no_signal_rarely_triggers_detection():
         cfg = TrialConfig(
             channel="ffp", u0=50.0, tE=20.0, rho=0.01, t0=5.0,
             mag_ref=21.0, seed=seed, cadence=_FAST_CADENCE,
+            search_timescale_grid_days=(0.1, 0.3, 1.0, 3.0),
         )
         r = run_trial(cfg)
         false_positives += int(r.event_detected)

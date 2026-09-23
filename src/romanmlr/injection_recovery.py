@@ -40,6 +40,9 @@ class TrialConfig:
     anomaly_threshold: float = 160.0
     cadence: CadenceConfig = field(default_factory=CadenceConfig)
     noise: NoiseConfig = field(default_factory=NoiseConfig)
+    search_timescale_grid_days: tuple[float, ...] = (
+        0.02, 0.08, 0.3, 1.0, 3.0, 10.0, 30.0, 100.0,
+    )
     grid_n: int = 400  # binary-lens ray-shooting resolution (planetary channel)
 
 
@@ -59,6 +62,13 @@ class TrialResult:
     fitted_t0: float
     fitted_u0: float
     fitted_tE: float
+    fit_success: bool
+    cadence_seed: int
+    epoch_seed: int
+    noise_seed: int
+    nearest_epoch_minutes: float
+    n_epochs_within_tE: int
+    season_edge_distance_tE: float
 
 
 def _sample_event_epoch(cfg: TrialConfig, rng: np.random.Generator) -> float:
@@ -68,9 +78,25 @@ def _sample_event_epoch(cfg: TrialConfig, rng: np.random.Generator) -> float:
     return float(cfg.cadence.season_start_days[season] + rng.uniform(0, cfg.cadence.season_length_days))
 
 
+def _stream_seeds(master_seed: int) -> tuple[int, int, int]:
+    """Derive independent cadence, epoch, and noise streams from one seed."""
+    children = np.random.SeedSequence(master_seed).spawn(3)
+    return tuple(int(child.generate_state(1, dtype=np.uint32)[0]) for child in children)
+
+
+def _season_edge_distance_tE(cfg: TrialConfig, t0: float) -> float:
+    """Distance from the injected peak to its nearest season edge, in tE."""
+    for start in cfg.cadence.season_start_days:
+        end = start + cfg.cadence.season_length_days
+        if start <= t0 <= end:
+            return float(min(t0 - start, end - t0) / cfg.tE)
+    return float("nan")
+
+
 def run_trial(cfg: TrialConfig) -> TrialResult:
     start = time.perf_counter()
-    obs_cadence = CadenceConfig(**{**asdict(cfg.cadence), "seed": cfg.seed})
+    cadence_seed, epoch_seed, noise_seed = _stream_seeds(cfg.seed)
+    obs_cadence = CadenceConfig(**{**asdict(cfg.cadence), "seed": cadence_seed})
     t = generate_observation_times(obs_cadence)
     if cfg.channel == "planetary" or cfg.q > 0:
         raise RuntimeError(
@@ -78,7 +104,7 @@ def run_trial(cfg: TrialConfig) -> TrialResult:
             "passed independent binary-lens validation"
         )
 
-    rng = np.random.default_rng(cfg.seed)
+    rng = np.random.default_rng(epoch_seed)
     injected_t0 = _sample_event_epoch(cfg, rng)
     truth = PSPLParams(t0=injected_t0, u0=cfg.u0, tE=cfg.tE)
     tau = (t - truth.t0) / truth.tE
@@ -89,16 +115,26 @@ def run_trial(cfg: TrialConfig) -> TrialResult:
 
     flux_clean = cfg.fs * amp + cfg.fb
     mag_clean = -2.5 * np.log10(np.clip(flux_clean, 1e-6, None)) + cfg.mag_ref
-    noise_cfg = NoiseConfig(**{**asdict(cfg.noise), "seed": cfg.seed})
+    noise_cfg = NoiseConfig(**{**asdict(cfg.noise), "seed": noise_seed})
     mag_noisy, sigma_mag = add_noise(mag_clean, noise_cfg)
     flux_noisy = 10 ** (-0.4 * (mag_noisy - cfg.mag_ref))
     sigma_flux = np.abs(flux_noisy * np.log(10) * 0.4 * sigma_mag)
     sigma_flux = np.maximum(sigma_flux, 1e-6)
 
-    fit = blind_search_pspl(t, flux_noisy, sigma_flux)
+    fit = blind_search_pspl(
+        t,
+        flux_noisy,
+        sigma_flux,
+        timescale_grid_days=cfg.search_timescale_grid_days,
+    )
 
     dchi2_event = event_delta_chi2(fit, flux_noisy, sigma_flux)
-    event_detected = dchi2_event > cfg.detection_threshold
+    event_detected = fit.success and dchi2_event > cfg.detection_threshold
+
+    epoch_offsets = np.abs(t - truth.t0)
+    nearest_epoch_minutes = float(epoch_offsets.min() * 24.0 * 60.0)
+    n_epochs_within_tE = int(np.count_nonzero(epoch_offsets <= truth.tE))
+    season_edge_distance_tE = _season_edge_distance_tE(cfg, truth.t0)
 
     if cfg.channel == "ffp":
         # The FFP signal *is* the single-lens event fit here; there is no
@@ -138,6 +174,13 @@ def run_trial(cfg: TrialConfig) -> TrialResult:
         fitted_t0=float(fit.params.t0),
         fitted_u0=float(fit.params.u0),
         fitted_tE=float(fit.params.tE),
+        fit_success=bool(fit.success),
+        cadence_seed=cadence_seed,
+        epoch_seed=epoch_seed,
+        noise_seed=noise_seed,
+        nearest_epoch_minutes=nearest_epoch_minutes,
+        n_epochs_within_tE=n_epochs_within_tE,
+        season_edge_distance_tE=season_edge_distance_tE,
     )
 
 
@@ -159,6 +202,13 @@ def run_grid(configs: list[TrialConfig]) -> pd.DataFrame:
             "fitted_t0": r.fitted_t0,
             "fitted_u0": r.fitted_u0,
             "fitted_tE": r.fitted_tE,
+            "fit_success": r.fit_success,
+            "cadence_seed": r.cadence_seed,
+            "epoch_seed": r.epoch_seed,
+            "noise_seed": r.noise_seed,
+            "nearest_epoch_minutes": r.nearest_epoch_minutes,
+            "n_epochs_within_tE": r.n_epochs_within_tE,
+            "season_edge_distance_tE": r.season_edge_distance_tE,
             "event_delta_chi2": r.event_delta_chi2,
             "anomaly_delta_chi2": r.anomaly_delta_chi2,
             "event_detected": r.event_detected,

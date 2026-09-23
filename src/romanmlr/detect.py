@@ -36,6 +36,20 @@ class PSPLFitResult:
     success: bool
 
 
+def _full_model_chi2(
+    fit: PSPLFitResult,
+    t: np.ndarray,
+    flux: np.ndarray,
+    sigma: np.ndarray,
+) -> float:
+    """Evaluate a fitted PSPL model on an arbitrary set of epochs."""
+    u = np.sqrt(
+        ((t - fit.params.t0) / fit.params.tE) ** 2 + fit.params.u0**2
+    )
+    model = flux_model(u, fit.fs, fit.fb)
+    return float(np.sum(((model - flux) / sigma) ** 2))
+
+
 def _fit_pspl_single_attempt(
     t: np.ndarray, flux: np.ndarray, sigma: np.ndarray, x0: list, lower: list, upper: list,
 ) -> PSPLFitResult | None:
@@ -137,13 +151,19 @@ def blind_search_pspl(
     t: np.ndarray,
     flux: np.ndarray,
     sigma: np.ndarray,
-    timescale_grid_days: tuple[float, ...] = (0.1, 0.3, 1.0, 3.0, 10.0, 30.0, 100.0),
+    timescale_grid_days: tuple[float, ...] = (0.02, 0.08, 0.3, 1.0, 3.0, 10.0, 30.0, 100.0),
+    max_fit_points: int = 3000,
 ) -> PSPLFitResult:
     """Search for a PSPL event without access to injected parameters.
 
-    For each predeclared timescale, a boxcar matched-filter supplies a peak
-    epoch. Those data-derived candidates seed the same bounded PSPL fitter.
-    Null and injected light curves use this identical search and trial space.
+    A time-aware boxcar matched-filter scans every predeclared timescale and
+    chooses the highest-significance candidate.  One bounded PSPL fit is then
+    run on a deterministic local window plus a sparse baseline anchor.  The
+    returned chi-square is always recomputed on *all* input epochs, so the
+    acceleration does not change the detection statistic's denominator.
+
+    Injected truth is never consulted. Null and injected light curves use the
+    identical search space and look-elsewhere procedure.
     """
     t = np.asarray(t, dtype=float)
     flux = np.asarray(flux, dtype=float)
@@ -152,26 +172,50 @@ def blind_search_pspl(
         raise ValueError("t, flux, and sigma must be matching arrays with at least five samples")
     if np.any(sigma <= 0) or np.any(~np.isfinite(sigma)):
         raise ValueError("sigma must be finite and positive")
-    cadence = float(np.median(np.diff(t)))
     baseline = float(np.median(flux))
     standardized = (flux - baseline) / sigma
-    candidates: list[PSPLFitResult] = []
+    cumulative = np.concatenate(([0.0], np.cumsum(standardized)))
+    proposals: list[tuple[float, float, float]] = []
     for tE in timescale_grid_days:
         if tE <= 0:
             raise ValueError("timescale grid values must be positive")
-        width = int(np.clip(round(2.0 * tE / max(cadence, 1e-9)), 1, min(t.size, 2001)))
-        kernel = np.ones(width) / width
-        score = np.convolve(standardized, kernel, mode="same")
-        t0_guess = float(t[int(np.argmax(score))])
-        guess = PSPLParams(t0=t0_guess, u0=0.3, tE=tE)
-        fs0 = max(float(np.percentile(flux, 95) - baseline), 0.1)
-        fitted = fit_pspl(t, flux, sigma, guess, fs0=fs0, fb0=baseline - fs0)
-        if fitted.success and np.isfinite(fitted.chi2):
-            candidates.append(fitted)
-    if not candidates:
+        left = np.searchsorted(t, t - tE, side="left")
+        right = np.searchsorted(t, t + tE, side="right")
+        count = np.maximum(right - left, 1)
+        score = (cumulative[right] - cumulative[left]) / np.sqrt(count)
+        index = int(np.argmax(score))
+        proposals.append((float(score[index]), float(t[index]), float(tE)))
+
+    if not proposals:
         fallback = PSPLParams(t0=float(t[np.argmax(flux)]), u0=1.0, tE=1.0)
         return PSPLFitResult(fallback, 1.0, 0.0, np.inf, False)
-    return min(candidates, key=lambda result: result.chi2)
+
+    _, t0_guess, tE_guess = max(proposals, key=lambda item: item[0])
+    local_half_width = max(5.0 * tE_guess, 0.25)
+    local = np.flatnonzero(np.abs(t - t0_guess) <= local_half_width)
+    outside = np.flatnonzero(np.abs(t - t0_guess) > local_half_width)
+    baseline_budget = max(max_fit_points - local.size, 0)
+    if outside.size and baseline_budget:
+        anchor = outside[np.linspace(0, outside.size - 1, min(outside.size, baseline_budget), dtype=int)]
+        fit_indices = np.unique(np.concatenate((local, anchor)))
+    else:
+        fit_indices = local
+    if fit_indices.size > max_fit_points:
+        fit_indices = fit_indices[
+            np.linspace(0, fit_indices.size - 1, max_fit_points, dtype=int)
+        ]
+
+    guess = PSPLParams(t0=t0_guess, u0=0.3, tE=tE_guess)
+    fs0 = max(float(np.percentile(flux[fit_indices], 95) - baseline), 0.1)
+    fitted = fit_pspl(
+        t[fit_indices], flux[fit_indices], sigma[fit_indices], guess,
+        fs0=fs0, fb0=baseline - fs0,
+    )
+    if not fitted.success or not np.isfinite(fitted.chi2):
+        fallback = PSPLParams(t0=t0_guess, u0=1.0, tE=tE_guess)
+        return PSPLFitResult(fallback, 1.0, 0.0, np.inf, False)
+    fitted.chi2 = _full_model_chi2(fitted, t, flux, sigma)
+    return fitted
 
 
 def chi2_flat(flux: np.ndarray, sigma: np.ndarray) -> float:

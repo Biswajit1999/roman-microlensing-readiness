@@ -46,6 +46,27 @@ def completeness_by_bin(
     return pd.DataFrame(rows)
 
 
+def recovery_by_endpoint(
+    results: pd.DataFrame,
+    bin_cols: list[str],
+    endpoints: tuple[str, ...] = ("event_detected", "parameters_recovered"),
+) -> pd.DataFrame:
+    """Long-form recovery table for multiple predeclared binary endpoints.
+
+    A single table prevents the scientifically distinct claims "the search
+    crossed its detection threshold" and "the fitted parameters recovered the
+    injection" from being collapsed into one ambiguous completeness number.
+    """
+    tables = []
+    for endpoint in endpoints:
+        if endpoint not in results:
+            raise KeyError(f"missing endpoint column: {endpoint}")
+        table = completeness_by_bin(results, bin_cols, success_col=endpoint)
+        table.insert(len(bin_cols), "endpoint", endpoint)
+        tables.append(table)
+    return pd.concat(tables, ignore_index=True)
+
+
 def false_positive_rate(null_results: pd.DataFrame, detected_col: str = "event_detected") -> dict:
     """False-positive rate from trials with NO injected signal (pure noise
     realizations of the survey cadence/noise model), with a Wilson CI.
