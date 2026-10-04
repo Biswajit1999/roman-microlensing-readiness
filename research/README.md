@@ -10,8 +10,6 @@ outputs in `results/v0.5.0-release/` and `results/v0.5.0-null/`.
 - `recovery_by_sampling.csv` -- descriptive cadence-support strata.
 - `recovery_by_season_edge.csv` -- exploratory boundary-distance strata; small
   cells and no multiplicity correction make this hypothesis-generating only.
-- `research-quality-rubric.json` -- the explicit evidence behind the requested
-  before/after repository graph; an expert heuristic, not peer review.
 - `blind-search-performance-benchmark.json` -- a same-input diagnostic of the
   proposal-stage optimization, with a warning against generalizing the bright-
   case speedup to difficult boundary fits.

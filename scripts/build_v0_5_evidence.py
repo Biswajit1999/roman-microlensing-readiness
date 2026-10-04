@@ -12,20 +12,6 @@ import pandas as pd
 
 from romanmlr.completeness import recovery_by_endpoint, wilson_interval
 
-RUBRIC = [
-    ("Claim integrity", 3, 10, "mission-level wording replaced by a scoped estimand"),
-    ("Blind inference", 2, 9, "truth-seeded fitting replaced by a blind matched-filter search"),
-    ("Experimental power", 2, 8, "five repeats per cell replaced by 900 injections"),
-    ("RNG independence", 2, 10, "parameter-aware seeds and independent random streams"),
-    ("Provenance", 4, 10, "raw rows, copied config, hashes, dependency and git manifest"),
-    ("Negative results", 6, 10, "invalid planetary path preserved and runtime-disabled"),
-    ("Verification", 7, 10, "unit, physics, CLI, schema, and CI checks"),
-    ("Reproducibility", 6, 10, "one-command runs and generated evidence outputs"),
-    ("Performance", 4, 9, "time-aware proposal plus bounded local fit"),
-    ("Evidence clarity", 3, 9, "endpoint-separated tables, intervals, and figures"),
-]
-
-
 def _sha256(path: Path) -> str:
     # Git can materialize text files with CRLF or LF depending on checkout
     # settings. Hash canonical LF bytes so provenance checks are portable.
@@ -108,46 +94,6 @@ def _write_recovery_figure(table: pd.DataFrame, output: Path) -> None:
     plt.close(fig)
 
 
-def _write_rubric(output_json: Path, output_svg: Path) -> None:
-    payload = {
-        "name": "explicit repository research-quality audit rubric",
-        "scale": "0-10 per dimension; expert heuristic, not a user study or scientific metric",
-        "before_ref": "v0.3.0",
-        "after_ref": "v0.5.0",
-        "dimensions": [
-            {"dimension": name, "before": before, "after": after, "evidence": evidence}
-            for name, before, after, evidence in RUBRIC
-        ],
-        "total_before": sum(item[1] for item in RUBRIC),
-        "total_after": sum(item[2] for item in RUBRIC),
-        "maximum": 10 * len(RUBRIC),
-    }
-    output_json.write_text(json.dumps(payload, indent=2) + "\n")
-
-    names = [item[0] for item in RUBRIC][::-1]
-    before = [item[1] for item in RUBRIC][::-1]
-    after = [item[2] for item in RUBRIC][::-1]
-    y = np.arange(len(names))
-    fig, ax = plt.subplots(figsize=(10.5, 6.5), constrained_layout=True)
-    ax.barh(y - 0.18, before, height=0.32, color="#aab2bd", label="v0.3 baseline")
-    ax.barh(y + 0.18, after, height=0.32, color="#176b87", label="v0.5 upgrade")
-    ax.set_yticks(y, names)
-    ax.set_xlim(0, 10.4)
-    ax.set_xlabel("Audit score (0-10)")
-    ax.set_title("Research-quality audit: before and after")
-    ax.grid(axis="x", color="#d7dce2", linewidth=0.8)
-    ax.spines[["top", "right", "left"]].set_visible(False)
-    ax.legend(frameon=False, loc="lower right")
-    fig.text(
-        0.01, 0.005,
-        f"Explicit expert rubric: {payload['total_before']}/{payload['maximum']} to "
-        f"{payload['total_after']}/{payload['maximum']}. Not a peer-review score.",
-        fontsize=8, color="#4a5560",
-    )
-    _save_svg(fig, output_svg)
-    plt.close(fig)
-
-
 def build(
     trials_path: Path,
     null_trials_path: Path,
@@ -195,10 +141,6 @@ def build(
     }
     (output / "result_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     _write_recovery_figure(primary, figures / "recovery-vs-timescale-v0.5.svg")
-    _write_rubric(
-        output / "research-quality-rubric.json",
-        figures / "research-maturity-before-after.svg",
-    )
 
 
 def main() -> None:

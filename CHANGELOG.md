@@ -21,7 +21,7 @@ All notable changes to this project are documented here. Format follows
   randomness into independently recorded deterministic streams.
 - Added cadence-support and season-edge diagnostics to every raw trial.
 - Added endpoint-separated recovery tables, overall run summaries, evidence
-  generation, a before/after audit rubric, and end-to-end CLI tests.
+  generation, and end-to-end CLI tests.
 - Corrected CI to check the post-audit output filenames.
 - Published the clean-commit result: 864/900 detections, 710/900 parameter
   recoveries, 11 retained fit failures, and 0/1,000 triggers under the scoped

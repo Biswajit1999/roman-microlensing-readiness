@@ -20,7 +20,3 @@ the grid is balanced, conditional, and not population weighted.
 | 12 | The custom binary-lens solver supports scientific planetary inference. | Failed convergence limit and runtime guard | Rejected; pathway disabled |
 | 13 | v0.5 establishes Roman population completeness, readiness, yield, or survey false-positive rate. | None | Not claimed |
 | 14 | Earlier 58% recovery and 0/200 values describe the blind v0.5 pipeline. | Historical truth-seeded outputs | Superseded |
-
-The before/after 39/100 to 95/100 figure is an explicit expert repository-audit
-rubric (`research/research-quality-rubric.json`), not a peer-review score or a
-scientific performance statistic.

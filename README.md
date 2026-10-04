@@ -82,14 +82,6 @@ endpoint summaries, generated evidence, [claims ledger](docs/CLAIMS.md),
 [methods](docs/METHODS.md), [limitations](docs/LIMITATIONS.md), and
 [reproduction guide](docs/REPRODUCIBILITY.md) are all versioned.
 
-## Before / after research audit
-
-![Research-quality audit](results/figures/research-maturity-before-after.svg)
-
-The 39/100 to 95/100 comparison is an explicit expert audit rubric with ten
-documented dimensions. It is a repository-quality heuristic, not a peer-review
-score, user study, or scientific performance metric.
-
 ## Affiliation and marks
 
 “Roman” and “F146” are used descriptively. This project is not affiliated with

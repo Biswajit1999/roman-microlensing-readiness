@@ -9,6 +9,5 @@ Generated output only -- every file here is reproducible from
 - `v0.5.0-release/` -- clean-commit 900-injection blind recovery experiment.
 - `v0.5.0-null/` -- 1,000 constant-flux realizations searched identically.
 - `figures/recovery-vs-timescale-v0.5.svg` -- generated primary result figure.
-- `figures/research-maturity-before-after.svg` -- explicit expert audit rubric.
 - `default/` -- historical v0.2 truth-seeded output, scientifically superseded
   and retained only for provenance.
