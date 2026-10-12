@@ -1,0 +1,253 @@
+{
+  "schema": "romanmlr-selection-uncertainty/1",
+  "scope": "sensitivity of the committed balanced synthetic v0.5 software experiment",
+  "is_roman_population_forecast": false,
+  "threshold_rows": [
+    {
+      "threshold_delta_chi2": 10.0,
+      "signal_detected": 889,
+      "signal_trials": 900,
+      "conditional_detection_fraction": 0.9877777777777778,
+      "detection_ci_low": 0.9782474933211758,
+      "detection_ci_high": 0.9931618079799491,
+      "null_triggers": 460,
+      "null_trials": 1000,
+      "simple_null_fpr": 0.46,
+      "fpr_ci_low": 0.42932142688110647,
+      "fpr_ci_high": 0.49098471379773795,
+      "balanced_precision": 0.6822716807367613
+    },
+    {
+      "threshold_delta_chi2": 20.0,
+      "signal_detected": 889,
+      "signal_trials": 900,
+      "conditional_detection_fraction": 0.9877777777777778,
+      "detection_ci_low": 0.9782474933211758,
+      "detection_ci_high": 0.9931618079799491,
+      "null_triggers": 60,
+      "null_trials": 1000,
+      "simple_null_fpr": 0.06,
+      "fpr_ci_low": 0.04689647267593196,
+      "fpr_ci_high": 0.07647107479135655,
+      "balanced_precision": 0.9427359490986215
+    },
+    {
+      "threshold_delta_chi2": 25.0,
+      "signal_detected": 889,
+      "signal_trials": 900,
+      "conditional_detection_fraction": 0.9877777777777778,
+      "detection_ci_low": 0.9782474933211758,
+      "detection_ci_high": 0.9931618079799491,
+      "null_triggers": 8,
+      "null_trials": 1000,
+      "simple_null_fpr": 0.008,
+      "fpr_ci_low": 0.004059195818806103,
+      "fpr_ci_high": 0.015706334530980144,
+      "balanced_precision": 0.9919660790002232
+    },
+    {
+      "threshold_delta_chi2": 30.0,
+      "signal_detected": 889,
+      "signal_trials": 900,
+      "conditional_detection_fraction": 0.9877777777777778,
+      "detection_ci_low": 0.9782474933211758,
+      "detection_ci_high": 0.9931618079799491,
+      "null_triggers": 2,
+      "null_trials": 1000,
+      "simple_null_fpr": 0.002,
+      "fpr_ci_low": 0.000548643588120728,
+      "fpr_ci_high": 0.007262807863492177,
+      "balanced_precision": 0.9979793444095195
+    },
+    {
+      "threshold_delta_chi2": 40.0,
+      "signal_detected": 889,
+      "signal_trials": 900,
+      "conditional_detection_fraction": 0.9877777777777778,
+      "detection_ci_low": 0.9782474933211758,
+      "detection_ci_high": 0.9931618079799491,
+      "null_triggers": 0,
+      "null_trials": 1000,
+      "simple_null_fpr": 0.0,
+      "fpr_ci_low": 2.168404344971009e-19,
+      "fpr_ci_high": 0.0038267584855551234,
+      "balanced_precision": 1.0
+    },
+    {
+      "threshold_delta_chi2": 100.0,
+      "signal_detected": 889,
+      "signal_trials": 900,
+      "conditional_detection_fraction": 0.9877777777777778,
+      "detection_ci_low": 0.9782474933211758,
+      "detection_ci_high": 0.9931618079799491,
+      "null_triggers": 0,
+      "null_trials": 1000,
+      "simple_null_fpr": 0.0,
+      "fpr_ci_low": 2.168404344971009e-19,
+      "fpr_ci_high": 0.0038267584855551234,
+      "balanced_precision": 1.0
+    },
+    {
+      "threshold_delta_chi2": 250.0,
+      "signal_detected": 867,
+      "signal_trials": 900,
+      "conditional_detection_fraction": 0.9633333333333334,
+      "detection_ci_low": 0.9489543238091239,
+      "detection_ci_high": 0.9737738735543592,
+      "null_triggers": 0,
+      "null_trials": 1000,
+      "simple_null_fpr": 0.0,
+      "fpr_ci_low": 2.168404344971009e-19,
+      "fpr_ci_high": 0.0038267584855551234,
+      "balanced_precision": 1.0
+    },
+    {
+      "threshold_delta_chi2": 500.0,
+      "signal_detected": 864,
+      "signal_trials": 900,
+      "conditional_detection_fraction": 0.96,
+      "detection_ci_low": 0.9451210041792689,
+      "detection_ci_high": 0.9709688608290811,
+      "null_triggers": 0,
+      "null_trials": 1000,
+      "simple_null_fpr": 0.0,
+      "fpr_ci_low": 2.168404344971009e-19,
+      "fpr_ci_high": 0.0038267584855551234,
+      "balanced_precision": 1.0
+    },
+    {
+      "threshold_delta_chi2": 1000.0,
+      "signal_detected": 812,
+      "signal_trials": 900,
+      "conditional_detection_fraction": 0.9022222222222223,
+      "detection_ci_low": 0.8810741281985045,
+      "detection_ci_high": 0.9199513093208741,
+      "null_triggers": 0,
+      "null_trials": 1000,
+      "simple_null_fpr": 0.0,
+      "fpr_ci_low": 2.168404344971009e-19,
+      "fpr_ci_high": 0.0038267584855551234,
+      "balanced_precision": 1.0
+    },
+    {
+      "threshold_delta_chi2": 2000.0,
+      "signal_detected": 781,
+      "signal_trials": 900,
+      "conditional_detection_fraction": 0.8677777777777778,
+      "detection_ci_low": 0.8440763971346414,
+      "detection_ci_high": 0.8883529393816965,
+      "null_triggers": 0,
+      "null_trials": 1000,
+      "simple_null_fpr": 0.0,
+      "fpr_ci_low": 2.168404344971009e-19,
+      "fpr_ci_high": 0.0038267584855551234,
+      "balanced_precision": 1.0
+    }
+  ],
+  "dropout_rows": [
+    {
+      "dropout_fraction": 0.0,
+      "minimum_retained_epochs": 3,
+      "mean_retention_probability": 1.0,
+      "events_below_requirement_before_dropout": 0,
+      "n_injections": 900
+    },
+    {
+      "dropout_fraction": 0.05,
+      "minimum_retained_epochs": 3,
+      "mean_retention_probability": 0.9989959895833335,
+      "events_below_requirement_before_dropout": 0,
+      "n_injections": 900
+    },
+    {
+      "dropout_fraction": 0.1,
+      "minimum_retained_epochs": 3,
+      "mean_retention_probability": 0.9954299999999899,
+      "events_below_requirement_before_dropout": 0,
+      "n_injections": 900
+    },
+    {
+      "dropout_fraction": 0.2,
+      "minimum_retained_epochs": 3,
+      "mean_retention_probability": 0.978693333234004,
+      "events_below_requirement_before_dropout": 0,
+      "n_injections": 900
+    },
+    {
+      "dropout_fraction": 0.35,
+      "minimum_retained_epochs": 3,
+      "mean_retention_probability": 0.9299934059177873,
+      "events_below_requirement_before_dropout": 0,
+      "n_injections": 900
+    },
+    {
+      "dropout_fraction": 0.5,
+      "minimum_retained_epochs": 3,
+      "mean_retention_probability": 0.8644896464876461,
+      "events_below_requirement_before_dropout": 0,
+      "n_injections": 900
+    }
+  ],
+  "planning_rows": [
+    {
+      "assumed_recovery_fraction": 0.1,
+      "target_wilson_half_width": 0.1,
+      "minimum_trials_per_bin": 34
+    },
+    {
+      "assumed_recovery_fraction": 0.1,
+      "target_wilson_half_width": 0.05,
+      "minimum_trials_per_bin": 141
+    },
+    {
+      "assumed_recovery_fraction": 0.1,
+      "target_wilson_half_width": 0.03,
+      "minimum_trials_per_bin": 384
+    },
+    {
+      "assumed_recovery_fraction": 0.1,
+      "target_wilson_half_width": 0.02,
+      "minimum_trials_per_bin": 864
+    },
+    {
+      "assumed_recovery_fraction": 0.5,
+      "target_wilson_half_width": 0.1,
+      "minimum_trials_per_bin": 93
+    },
+    {
+      "assumed_recovery_fraction": 0.5,
+      "target_wilson_half_width": 0.05,
+      "minimum_trials_per_bin": 381
+    },
+    {
+      "assumed_recovery_fraction": 0.5,
+      "target_wilson_half_width": 0.03,
+      "minimum_trials_per_bin": 1064
+    },
+    {
+      "assumed_recovery_fraction": 0.5,
+      "target_wilson_half_width": 0.02,
+      "minimum_trials_per_bin": 2398
+    },
+    {
+      "assumed_recovery_fraction": 0.9,
+      "target_wilson_half_width": 0.1,
+      "minimum_trials_per_bin": 34
+    },
+    {
+      "assumed_recovery_fraction": 0.9,
+      "target_wilson_half_width": 0.05,
+      "minimum_trials_per_bin": 141
+    },
+    {
+      "assumed_recovery_fraction": 0.9,
+      "target_wilson_half_width": 0.03,
+      "minimum_trials_per_bin": 384
+    },
+    {
+      "assumed_recovery_fraction": 0.9,
+      "target_wilson_half_width": 0.02,
+      "minimum_trials_per_bin": 864
+    }
+  ]
+}

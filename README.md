@@ -82,6 +82,15 @@ endpoint summaries, generated evidence, [claims ledger](docs/CLAIMS.md),
 [methods](docs/METHODS.md), [limitations](docs/LIMITATIONS.md), and
 [reproduction guide](docs/REPRODUCIBILITY.md) are all versioned.
 
+## Selection-function sensitivity extension
+
+`python scripts/analyze_selection_uncertainty.py` derives three additional
+diagnostics from the committed v0.5 synthetic trials: a detection-threshold
+operating curve, analytic cadence-dropout retention, and per-bin injection
+counts needed for target Wilson precision. The assumptions and strict
+non-forecast boundary are documented in
+[`docs/SELECTION_UNCERTAINTY.md`](docs/SELECTION_UNCERTAINTY.md).
+
 ## Affiliation and marks
 
 “Roman” and “F146” are used descriptively. This project is not affiliated with
