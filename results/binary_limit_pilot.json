@@ -1,0 +1,246 @@
+{
+  "trajectory_tau": [
+    0.0,
+    0.08,
+    0.16,
+    0.28
+  ],
+  "trajectory_beta": [
+    0.1,
+    0.1,
+    0.1,
+    0.1
+  ],
+  "rho": 0.06,
+  "reference": [
+    10.564640967098319,
+    8.092175654972046,
+    5.441029896815703,
+    3.491760264779864
+  ],
+  "results": {
+    "220": {
+      "independent_grid": [
+        {
+          "q": 0.0,
+          "phase": 0.0,
+          "max_absolute_error": 0.24007195574188067,
+          "rms_fractional_error": 0.01884401435695252,
+          "min_ray_count": 42,
+          "step_over_rho": 0.5090909090909091
+        },
+        {
+          "q": 0.0,
+          "phase": 0.5,
+          "max_absolute_error": 0.1699558370386285,
+          "rms_fractional_error": 0.022548328929845884,
+          "min_ray_count": 44,
+          "step_over_rho": 0.5090909090909091
+        },
+        {
+          "q": 1e-06,
+          "phase": 0.0,
+          "max_absolute_error": 0.24007195574188067,
+          "rms_fractional_error": 0.01884401435695252,
+          "min_ray_count": 42,
+          "step_over_rho": 0.5090909090909091
+        },
+        {
+          "q": 1e-06,
+          "phase": 0.5,
+          "max_absolute_error": 0.1699558370386285,
+          "rms_fractional_error": 0.022548328929845884,
+          "min_ray_count": 44,
+          "step_over_rho": 0.5090909090909091
+        },
+        {
+          "q": 0.0001,
+          "phase": 0.0,
+          "max_absolute_error": 0.24007195574188067,
+          "rms_fractional_error": 0.01709744682149174,
+          "min_ray_count": 42,
+          "step_over_rho": 0.5090909090909091
+        },
+        {
+          "q": 0.0001,
+          "phase": 0.5,
+          "max_absolute_error": 0.1699558370386285,
+          "rms_fractional_error": 0.02136016191679391,
+          "min_ray_count": 44,
+          "step_over_rho": 0.5090909090909091
+        }
+      ],
+      "production_solver": {
+        "1e-06": {
+          "magnification": [
+            10.229690543882116,
+            8.167252934228463,
+            5.2798402807133495,
+            3.6298901929904277
+          ],
+          "max_absolute_error": 0.3349504232162026,
+          "rms_fractional_error": 0.02972291279853009
+        },
+        "0.0001": {
+          "magnification": [
+            10.229690543882116,
+            8.167252934228463,
+            5.2798402807133495,
+            3.6298901929904277
+          ],
+          "max_absolute_error": 0.3349504232162026,
+          "rms_fractional_error": 0.02972291279853009
+        }
+      }
+    },
+    "360": {
+      "independent_grid": [
+        {
+          "q": 0.0,
+          "phase": 0.0,
+          "max_absolute_error": 0.11292221020380655,
+          "rms_fractional_error": 0.017811660636028057,
+          "min_ray_count": 117,
+          "step_over_rho": 0.3111111111111111
+        },
+        {
+          "q": 0.0,
+          "phase": 0.5,
+          "max_absolute_error": 0.15697871738054126,
+          "rms_fractional_error": 0.010584935697354615,
+          "min_ray_count": 112,
+          "step_over_rho": 0.3111111111111111
+        },
+        {
+          "q": 1e-06,
+          "phase": 0.0,
+          "max_absolute_error": 0.11292221020380655,
+          "rms_fractional_error": 0.017811660636028057,
+          "min_ray_count": 117,
+          "step_over_rho": 0.3111111111111111
+        },
+        {
+          "q": 1e-06,
+          "phase": 0.5,
+          "max_absolute_error": 0.15697871738054126,
+          "rms_fractional_error": 0.010584935697354615,
+          "min_ray_count": 112,
+          "step_over_rho": 0.3111111111111111
+        },
+        {
+          "q": 0.0001,
+          "phase": 0.0,
+          "max_absolute_error": 0.11292221020380655,
+          "rms_fractional_error": 0.01691756175927943,
+          "min_ray_count": 117,
+          "step_over_rho": 0.3111111111111111
+        },
+        {
+          "q": 0.0001,
+          "phase": 0.5,
+          "max_absolute_error": 0.15697871738054126,
+          "rms_fractional_error": 0.009713187578252005,
+          "min_ray_count": 112,
+          "step_over_rho": 0.3111111111111111
+        }
+      ],
+      "production_solver": {
+        "1e-06": {
+          "magnification": [
+            10.90647562616105,
+            7.9487873207614435,
+            5.422428559899279,
+            3.3890178499370496
+          ],
+          "max_absolute_error": 0.3418346590627319,
+          "rms_fractional_error": 0.023655826563572655
+        },
+        "0.0001": {
+          "magnification": [
+            10.90647562616105,
+            7.979596573942689,
+            5.422428559899279,
+            3.3890178499370496
+          ],
+          "max_absolute_error": 0.3418346590627319,
+          "rms_fractional_error": 0.023010662555283813
+        }
+      }
+    },
+    "520": {
+      "independent_grid": [
+        {
+          "q": 0.0,
+          "phase": 0.0,
+          "max_absolute_error": 0.14776394505571133,
+          "rms_fractional_error": 0.013186623198681597,
+          "min_ray_count": 233,
+          "step_over_rho": 0.2153846153846154
+        },
+        {
+          "q": 0.0,
+          "phase": 0.5,
+          "max_absolute_error": 0.1558848977409717,
+          "rms_fractional_error": 0.012106191107509679,
+          "min_ray_count": 240,
+          "step_over_rho": 0.2153846153846154
+        },
+        {
+          "q": 1e-06,
+          "phase": 0.0,
+          "max_absolute_error": 0.14776394505571133,
+          "rms_fractional_error": 0.013186623198681597,
+          "min_ray_count": 233,
+          "step_over_rho": 0.2153846153846154
+        },
+        {
+          "q": 1e-06,
+          "phase": 0.5,
+          "max_absolute_error": 0.1558848977409717,
+          "rms_fractional_error": 0.012106191107509679,
+          "min_ray_count": 240,
+          "step_over_rho": 0.2153846153846154
+        },
+        {
+          "q": 0.0001,
+          "phase": 0.0,
+          "max_absolute_error": 0.14776394505571133,
+          "rms_fractional_error": 0.013186623198681597,
+          "min_ray_count": 233,
+          "step_over_rho": 0.2153846153846154
+        },
+        {
+          "q": 0.0001,
+          "phase": 0.5,
+          "max_absolute_error": 0.18541802800938534,
+          "rms_fractional_error": 0.011438205367763871,
+          "min_ray_count": 239,
+          "step_over_rho": 0.2153846153846154
+        }
+      ],
+      "production_solver": {
+        "1e-06": {
+          "magnification": [
+            10.543327505823527,
+            8.033011433008403,
+            5.434095969388037,
+            3.4701428065385564
+          ],
+          "max_absolute_error": 0.059164221963643016,
+          "rms_fractional_error": 0.004936531590252559
+        },
+        "0.0001": {
+          "magnification": [
+            10.572860636091942,
+            8.033011433008403,
+            5.404562839119623,
+            3.4553762414043496
+          ],
+          "max_absolute_error": 0.059164221963643016,
+          "rms_fractional_error": 0.00720340026234969
+        }
+      }
+    }
+  },
+  "warning": "Diagnostic only. The bound-planet channel remains blocked by issue #9; no independent VBMicrolensing/pyLIMA comparison has been performed."
+}
