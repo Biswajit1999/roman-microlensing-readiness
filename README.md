@@ -10,6 +10,12 @@ and phenomenological noise proxy. This is not an official Roman product,
 readiness assessment, population forecast, discovery pipeline, or analysis of
 Roman flight data.
 
+## Research evidence and downloads
+
+[Open the evidence browser file](evidence.html) for 13 selected files, including [`result_summary.json`](research/result_summary.json). Each file has a download link and SHA-256 digest. Serve this checkout with `python -m http.server` to view the static browser.
+
+Rebuild the inventory and browser with `python scripts/evidence_catalog.py` and `python scripts/render_evidence_page.py`.
+
 ## v0.5 result
 
 ![Blind detection and parameter recovery](results/figures/recovery-vs-timescale-v0.5.svg)
