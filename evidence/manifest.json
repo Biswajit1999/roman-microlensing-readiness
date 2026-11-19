@@ -1,0 +1,249 @@
+{
+  "schema": 1,
+  "project": "Synthetic Point-Lens Microlensing Recovery Study",
+  "repository": "https://github.com/Biswajit1999/roman-microlensing-readiness",
+  "files": [
+    {
+      "label": "Data source notes",
+      "path": "data/README.md",
+      "role": "Data and provenance",
+      "bytes": 422,
+      "sha256": "abce5e66ca50b75a74a4cf82de931049562ef71f0a07b435d9f0431c5fa68d3b",
+      "hash_basis": "LF-normalised text",
+      "format": "MD"
+    },
+    {
+      "label": "Project claims",
+      "path": "docs/CLAIMS.md",
+      "role": "Data and provenance",
+      "bytes": 2716,
+      "sha256": "c9baca8d340e178d6453d3bd3eed07753c8d5b2abdcfd20b172be93c38f505c3",
+      "hash_basis": "LF-normalised text",
+      "format": "MD"
+    },
+    {
+      "label": "Project data sources",
+      "path": "docs/DATA_SOURCES.md",
+      "role": "Data and provenance",
+      "bytes": 4949,
+      "sha256": "aac2f6872a5b66c2fac34cadd908999da457ed3ad5419b426f072f94baf82028",
+      "hash_basis": "LF-normalised text",
+      "format": "MD"
+    },
+    {
+      "label": "Project methods",
+      "path": "docs/METHODS.md",
+      "role": "Data and provenance",
+      "bytes": 2844,
+      "sha256": "84459c5544ffac424b63de2d33cdc8a05a4c262df220fbab6dff1abf0e2ef0f6",
+      "hash_basis": "LF-normalised text",
+      "format": "MD"
+    },
+    {
+      "label": "Result summary",
+      "path": "research/result_summary.json",
+      "role": "Tables and numerical results",
+      "bytes": 1272,
+      "sha256": "692d5c58cee3040ccc32d722d9afe90d1265459b752f4cf5d4b78d89e107406c",
+      "hash_basis": "LF-normalised text",
+      "format": "JSON",
+      "keys": [
+        "scope",
+        "input_sha256",
+        "n_injections",
+        "event_detection",
+        "parameter_recovery",
+        "parameter_recovery_given_detection",
+        "fit_failures"
+      ],
+      "arrays": {}
+    },
+    {
+      "label": "Null summary",
+      "path": "results/post_audit_null_smoke/null_summary.json",
+      "role": "Tables and numerical results",
+      "bytes": 203,
+      "sha256": "22ca566c40d0d71dd8182494229cea60ee5e56794a82b4285cba44957aa5729a",
+      "hash_basis": "LF-normalised text",
+      "format": "JSON",
+      "keys": [
+        "n_trials",
+        "n_false_positive",
+        "fpr",
+        "ci_low",
+        "ci_high",
+        "scope",
+        "threshold"
+      ],
+      "arrays": {}
+    },
+    {
+      "label": "Null summary",
+      "path": "results/v0.5.0-null/null_summary.json",
+      "role": "Tables and numerical results",
+      "bytes": 226,
+      "sha256": "6344e76189cb48d673c27493c9ad6c9f77e5ff2d1d5298ad810d86664364abc3",
+      "hash_basis": "LF-normalised text",
+      "format": "JSON",
+      "keys": [
+        "n_trials",
+        "n_false_positive",
+        "fpr",
+        "ci_low",
+        "ci_high",
+        "scope",
+        "threshold"
+      ],
+      "arrays": {}
+    },
+    {
+      "label": "Run summary",
+      "path": "results/v0.5.0-release/run_summary.json",
+      "role": "Tables and numerical results",
+      "bytes": 344,
+      "sha256": "02e5efa0ba416a0aa642eb65b736e52310c5c36ba9153d15063525c6172ecb7b",
+      "hash_basis": "LF-normalised text",
+      "format": "JSON",
+      "keys": [
+        "n_trials",
+        "n_fit_failures",
+        "event_detected",
+        "parameters_recovered"
+      ],
+      "arrays": {}
+    },
+    {
+      "label": "Cadence dropout retention",
+      "path": "research/cadence_dropout_retention.csv",
+      "role": "Tables and numerical results",
+      "bytes": 293,
+      "sha256": "61caf3feb0ac41c4db8f7494a779904dde822dd73567685f121deabb43d7a4eb",
+      "hash_basis": "LF-normalised text",
+      "format": "CSV",
+      "rows": 6,
+      "columns": 5,
+      "headers": [
+        "dropout_fraction",
+        "minimum_retained_epochs",
+        "mean_retention_probability",
+        "events_below_requirement_before_dropout",
+        "n_injections"
+      ],
+      "preview": [
+        [
+          "0.0",
+          "3",
+          "1.0",
+          "0",
+          "900"
+        ],
+        [
+          "0.05",
+          "3",
+          "0.9989959895833335",
+          "0",
+          "900"
+        ],
+        [
+          "0.1",
+          "3",
+          "0.9954299999999899",
+          "0",
+          "900"
+        ],
+        [
+          "0.2",
+          "3",
+          "0.978693333234004",
+          "0",
+          "900"
+        ]
+      ]
+    },
+    {
+      "label": "Recovery by magnitude timescale",
+      "path": "research/recovery_by_magnitude_timescale.csv",
+      "role": "Tables and numerical results",
+      "bytes": 1854,
+      "sha256": "8878de410d861b7dcc5c90a200499491d78d6d6d474ceade91e3295a9f3f3456",
+      "hash_basis": "LF-normalised text",
+      "format": "CSV",
+      "rows": 24,
+      "columns": 8,
+      "headers": [
+        "mag_ref",
+        "tE",
+        "endpoint",
+        "n_trials",
+        "n_success",
+        "completeness",
+        "ci_low"
+      ],
+      "preview": [
+        [
+          "19.0",
+          "0.02",
+          "event_detected",
+          "75",
+          "75",
+          "1.0",
+          "0.9512761575171942"
+        ],
+        [
+          "19.0",
+          "0.08",
+          "event_detected",
+          "75",
+          "75",
+          "1.0",
+          "0.9512761575171942"
+        ],
+        [
+          "19.0",
+          "0.3",
+          "event_detected",
+          "75",
+          "75",
+          "1.0",
+          "0.9512761575171942"
+        ],
+        [
+          "19.0",
+          "1.0",
+          "event_detected",
+          "75",
+          "75",
+          "1.0",
+          "0.9512761575171942"
+        ]
+      ]
+    },
+    {
+      "label": "Completeness default",
+      "path": "results/figures/completeness_default.png",
+      "role": "Figures",
+      "bytes": 120979,
+      "sha256": "365ca2b626552480c2acde79281e53e9c135b202f177442d30dc4753c4b71294",
+      "hash_basis": "exact bytes",
+      "format": "PNG"
+    },
+    {
+      "label": "Selection uncertainty",
+      "path": "results/figures/selection-uncertainty.png",
+      "role": "Figures",
+      "bytes": 91252,
+      "sha256": "1605caf625b131754427982746fc85fb5749119e2074568e3e473937ffd42e49",
+      "hash_basis": "exact bytes",
+      "format": "PNG"
+    },
+    {
+      "label": "Recovery vs timescale v0.5",
+      "path": "results/figures/recovery-vs-timescale-v0.5.svg",
+      "role": "Figures",
+      "bytes": 33713,
+      "sha256": "a9ee7ff613b1a9afe209ecd3b7c33f36fe7bb427fce8e83f71d07564d3306c2c",
+      "hash_basis": "LF-normalised text",
+      "format": "SVG"
+    }
+  ]
+}

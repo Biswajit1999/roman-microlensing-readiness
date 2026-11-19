@@ -1,0 +1,71 @@
+{
+  "project": "Synthetic Point-Lens Microlensing Recovery Study",
+  "repository": "https://github.com/Biswajit1999/roman-microlensing-readiness",
+  "files": [
+    {
+      "label": "Data source notes",
+      "path": "data/README.md",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Project claims",
+      "path": "docs/CLAIMS.md",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Project data sources",
+      "path": "docs/DATA_SOURCES.md",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Project methods",
+      "path": "docs/METHODS.md",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Result summary",
+      "path": "research/result_summary.json",
+      "role": "Tables and numerical results"
+    },
+    {
+      "label": "Null summary",
+      "path": "results/post_audit_null_smoke/null_summary.json",
+      "role": "Tables and numerical results"
+    },
+    {
+      "label": "Null summary",
+      "path": "results/v0.5.0-null/null_summary.json",
+      "role": "Tables and numerical results"
+    },
+    {
+      "label": "Run summary",
+      "path": "results/v0.5.0-release/run_summary.json",
+      "role": "Tables and numerical results"
+    },
+    {
+      "label": "Cadence dropout retention",
+      "path": "research/cadence_dropout_retention.csv",
+      "role": "Tables and numerical results"
+    },
+    {
+      "label": "Recovery by magnitude timescale",
+      "path": "research/recovery_by_magnitude_timescale.csv",
+      "role": "Tables and numerical results"
+    },
+    {
+      "label": "Completeness default",
+      "path": "results/figures/completeness_default.png",
+      "role": "Figures"
+    },
+    {
+      "label": "Selection uncertainty",
+      "path": "results/figures/selection-uncertainty.png",
+      "role": "Figures"
+    },
+    {
+      "label": "Recovery vs timescale v0.5",
+      "path": "results/figures/recovery-vs-timescale-v0.5.svg",
+      "role": "Figures"
+    }
+  ]
+}
